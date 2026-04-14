@@ -42,7 +42,7 @@ class Laporan_model extends CI_Model
         $this->db
             ->select("tb_pegawai.nama, COUNT(tb_cuti.id) AS total_pengajuan, SUM(CASE WHEN tb_cuti.status = 'PENDING' THEN 1 ELSE 0 END) AS pending, SUM(CASE WHEN tb_cuti.status = 'APPROVED_UNIT' THEN 1 ELSE 0 END) AS approved_unit, SUM(CASE WHEN tb_cuti.status = 'APPROVED_HR' THEN 1 ELSE 0 END) AS approved_hr, SUM(CASE WHEN tb_cuti.status = 'DITOLAK' THEN 1 ELSE 0 END) AS ditolak", FALSE)
             ->from('tb_pegawai')
-            ->join('tb_cuti', 'tb_cuti.pegawai_id = tb_pegawai.id AND tb_cuti.deleted_at IS NULL AND tb_cuti.tgl_mulai >= "'.$start.'" AND tb_cuti.tgl_mulai <= "'.$end.'"', 'left')
+            ->join('tb_cuti', 'tb_cuti.pegawai_id = tb_pegawai.id AND tb_cuti.deleted_at IS NULL AND tb_cuti.tgl_mulai <= "'.$end.'" AND tb_cuti.tgl_selesai >= "'.$start.'"', 'left')
             ->where('tb_pegawai.deleted_at', NULL)
             ->group_by('tb_pegawai.id')
             ->order_by('tb_pegawai.nama', 'ASC');
