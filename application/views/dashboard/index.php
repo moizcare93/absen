@@ -1,4 +1,4 @@
-<header class="rounded-[2rem] bg-slate-900 p-5 text-white shadow-soft lg:p-7">
+<header class="overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-950 via-slate-900 to-brand-700 p-6 text-white shadow-soft lg:p-8">
     <div class="flex items-start justify-between gap-4">
         <div>
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">Dashboard</p>
@@ -22,23 +22,23 @@
 
 <section class="mt-4 space-y-4">
     <?php if (!empty($admin_snapshot)): ?>
-        <div class="grid grid-cols-3 gap-3 xl:grid-cols-3">
-            <div class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft">
+        <div class="grid gap-4 md:grid-cols-3">
+            <div class="admin-desktop-card rounded-[2rem] p-5">
                 <p class="text-xs text-slate-500">Pegawai Aktif</p>
                 <p class="mt-2 text-2xl font-black text-slate-900"><?php echo (int) $admin_snapshot['employees']; ?></p>
             </div>
-            <div class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft">
+            <div class="admin-desktop-card rounded-[2rem] p-5">
                 <p class="text-xs text-slate-500">Cuti Pending</p>
                 <p class="mt-2 text-2xl font-black text-slate-900"><?php echo (int) $admin_snapshot['pending_leave']; ?></p>
             </div>
-            <div class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft">
+            <div class="admin-desktop-card rounded-[2rem] p-5">
                 <p class="text-xs text-slate-500">Absen Hari Ini</p>
                 <p class="mt-2 text-2xl font-black text-slate-900"><?php echo (int) $admin_snapshot['attendance_today']; ?></p>
             </div>
         </div>
     <?php endif; ?>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-bold text-slate-900">Aksi Cepat</p>
@@ -56,7 +56,7 @@
     </div>
 
     <div class="grid gap-4 xl:grid-cols-[1.4fr_0.9fr]">
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-bold text-slate-900">Jadwal Terdekat</p>
@@ -86,7 +86,7 @@
         </div>
     </div>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <p class="text-sm font-bold text-slate-900">Saldo Cuti</p>
         <div class="mt-4 grid grid-cols-2 gap-3">
             <div class="rounded-2xl bg-emerald-50 p-4">

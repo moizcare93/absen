@@ -5,7 +5,7 @@
         <p class="mt-2 text-sm text-slate-300">Menu ini sudah mendukung tambah, update, dan hapus/nonaktifkan pegawai.</p>
     </header>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft lg:p-6">
+    <div class="admin-panel rounded-[2rem] p-5 lg:p-6">
         <div class="flex items-center justify-between gap-3">
             <div>
                 <p class="text-sm font-bold text-slate-900"><?php echo !empty($editing) ? 'Edit Pegawai' : 'Tambah Pegawai'; ?></p>
@@ -108,7 +108,49 @@
         </form>
     </div>
 
-    <div class="grid gap-4 xl:grid-cols-2">
+    <div class="hidden xl:block admin-panel rounded-[2rem] overflow-hidden">
+        <div class="border-b border-slate-200 px-6 py-4">
+            <p class="text-sm font-bold text-slate-900">Daftar Pegawai</p>
+            <p class="text-xs text-slate-500">Mode tabel desktop untuk monitoring cepat.</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-slate-50 text-left text-xs uppercase tracking-[0.16em] text-slate-500">
+                    <tr>
+                        <th class="px-6 py-4">Pegawai</th>
+                        <th class="px-6 py-4">Unit</th>
+                        <th class="px-6 py-4">Role</th>
+                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <?php foreach ($employees as $employee): ?>
+                        <tr class="bg-white">
+                            <td class="px-6 py-4">
+                                <p class="font-semibold text-slate-900"><?php echo html_escape($employee['nama']); ?></p>
+                                <p class="text-xs text-slate-500"><?php echo html_escape($employee['nip']); ?> • <?php echo html_escape($employee['email']); ?></p>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600"><?php echo html_escape($employee['nama_unit']); ?></td>
+                            <td class="px-6 py-4 text-slate-600"><?php echo html_escape($employee['nama_role'] ? $employee['nama_role'] : 'Belum ada akun'); ?></td>
+                            <td class="px-6 py-4"><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"><?php echo html_escape($employee['status']); ?></span></td>
+                            <td class="px-6 py-4">
+                                <div class="flex justify-end gap-2">
+                                    <a href="<?php echo site_url('pegawai?edit=' . (int) $employee['id']); ?>" class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700">Update</a>
+                                    <form method="post" action="<?php echo site_url('pegawai/hapus/' . (int) $employee['id']); ?>">
+                                        <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                                        <button type="submit" class="rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700" onclick="return confirm('Hapus/nonaktifkan pegawai ini?')">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="grid gap-4 xl:hidden">
         <?php foreach ($employees as $employee): ?>
             <article class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft">
                 <div class="flex items-start justify-between gap-3">

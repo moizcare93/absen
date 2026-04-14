@@ -5,7 +5,8 @@
         <p class="mt-2 text-sm text-slate-300">Tombol aksi utama dibuat selalu dekat jangkauan ibu jari agar check-in lebih cepat.</p>
     </header>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+    <div class="admin-panel rounded-[2rem] p-5">
         <div class="rounded-[1.75rem] bg-slate-950 p-3 text-white">
             <div class="flex items-center justify-between gap-3">
                 <div>
@@ -28,16 +29,16 @@
             </div>
 
             <div class="mt-4 relative overflow-hidden rounded-[1.25rem] border border-dashed border-white/25 bg-slate-900">
-                <video id="attendance-video" class="aspect-[4/5] w-full object-cover" autoplay playsinline muted></video>
+                <video id="attendance-video" class="aspect-[4/5] w-full object-cover xl:aspect-[16/10]" autoplay playsinline muted></video>
                 <canvas id="attendance-canvas" class="hidden"></canvas>
-                <img id="attendance-preview" alt="Preview foto absensi" class="hidden aspect-[4/5] w-full object-cover">
+                <img id="attendance-preview" alt="Preview foto absensi" class="hidden aspect-[4/5] w-full object-cover xl:aspect-[16/10]">
                 <div id="camera-placeholder" class="absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-slate-300">
                     Meminta akses kamera browser untuk mengambil foto absensi.
                 </div>
             </div>
         </div>
 
-        <div class="sticky bottom-20 z-10 mt-4 rounded-[1.75rem] border border-slate-200 bg-white/95 p-3 shadow-soft backdrop-blur">
+        <div class="sticky bottom-20 z-10 mt-4 rounded-[1.75rem] border border-slate-200 bg-white/95 p-3 shadow-soft backdrop-blur xl:static xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none">
             <div class="grid grid-cols-2 gap-3">
                 <form id="checkin-form" method="post" action="<?php echo site_url('absensi/masuk'); ?>">
                     <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
@@ -68,7 +69,7 @@
             </div>
         </div>
 
-        <div class="mt-4 space-y-3">
+        <div class="mt-4 space-y-3 xl:hidden">
             <div class="rounded-2xl bg-slate-50 p-4">
                 <div class="flex items-start justify-between gap-3">
                     <div>
@@ -97,7 +98,36 @@
         </div>
     </div>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="space-y-4">
+    <div class="admin-panel rounded-[2rem] p-5">
+        <div class="space-y-3">
+            <div class="rounded-2xl bg-slate-50 p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-bold text-slate-900"><?php echo html_escape(!empty($reference_location['nama_lokasi']) ? $reference_location['nama_lokasi'] : 'GPS Rumah Sakit'); ?></p>
+                        <p class="mt-1 text-xs text-slate-500">Lat <?php echo html_escape($office_latitude); ?>, Lng <?php echo html_escape($office_longitude); ?></p>
+                    </div>
+                    <span id="gps-badge-desktop" class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700 xl:inline-flex hidden">Sinkron</span>
+                </div>
+                <p class="mt-3 text-xs text-slate-500">Gunakan panel kiri untuk ambil foto dan tombol aksi. Panel kanan fokus pada konteks lokasi, jadwal, dan riwayat.</p>
+            </div>
+            <?php if (!empty($schedule_today)): ?>
+                <div class="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                    Jadwal hari ini:
+                    <span class="font-semibold text-slate-900"><?php echo html_escape($schedule_today['nama_shift']); ?></span>
+                    <?php echo html_escape(substr($schedule_today['jam_masuk'], 0, 5)); ?> - <?php echo html_escape(substr($schedule_today['jam_keluar'], 0, 5)); ?>
+                </div>
+            <?php endif; ?>
+            <details class="rounded-2xl border border-slate-200 bg-white p-4" open>
+                <summary class="cursor-pointer text-sm font-semibold text-slate-700">Catatan absensi</summary>
+                <div class="mt-3">
+                    <textarea id="attendance-note-desktop" rows="4" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none ring-brand-500 transition focus:border-brand-500 focus:bg-white focus:ring-2" placeholder="Opsional, mis. kunjungan unit luar atau pergantian shift."><?php echo set_value('catatan'); ?></textarea>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <div class="admin-panel rounded-[2rem] p-5">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-bold text-slate-900">Rekap Absensi</p>
@@ -168,6 +198,8 @@
             <?php endif; ?>
         </div>
     </div>
+    </div>
+    </div>
 </section>
 
 <script>
@@ -180,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var cameraBadge = document.getElementById('camera-badge');
     var gpsBadge = document.getElementById('gps-badge');
     var gpsStatus = document.getElementById('gps-status');
-    var noteField = document.getElementById('attendance-note');
+    var noteFields = Array.prototype.slice.call(document.querySelectorAll('#attendance-note, #attendance-note-desktop'));
     var captureButton = document.getElementById('capture-button');
     var refreshLocationButton = document.getElementById('refresh-location-button');
     var latestPhoto = '';
@@ -193,10 +225,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             form.querySelector('input[name="photo_data"]').value = latestPhoto;
-            form.querySelector('input[name="catatan"]').value = noteField.value;
+            form.querySelector('input[name="catatan"]').value = noteFields.length ? noteFields[0].value : '';
             form.querySelector('input[name="latitude"]').value = latestCoords ? latestCoords.latitude : '';
             form.querySelector('input[name="longitude"]').value = latestCoords ? latestCoords.longitude : '';
         });
+    }
+
+    function syncNoteFields(source) {
+        noteFields.forEach(function (field) {
+            if (field !== source) {
+                field.value = source.value;
+            }
+        });
+        syncForms();
     }
 
     function setGpsState(kind, message) {
@@ -311,7 +352,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    noteField.addEventListener('input', syncForms);
+    noteFields.forEach(function (field) {
+        field.addEventListener('input', function () {
+            syncNoteFields(field);
+        });
+    });
     captureButton.addEventListener('click', captureFrame);
     refreshLocationButton.addEventListener('click', requestLocation);
 

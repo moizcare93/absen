@@ -30,8 +30,28 @@
     <style>
         body {
             background:
-                radial-gradient(circle at top, rgba(15, 118, 110, 0.14), transparent 36%),
-                linear-gradient(180deg, #f7fafc 0%, #eef6f4 100%);
+                radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 24%),
+                radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.08), transparent 28%),
+                linear-gradient(180deg, #eef3f8 0%, #e7edf4 100%);
+        }
+
+        .admin-shell {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.74));
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 22px 60px rgba(15, 23, 42, 0.08);
+            backdrop-filter: blur(14px);
+        }
+
+        .admin-panel {
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+        }
+
+        .admin-desktop-card {
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, #ffffff, #f8fafc);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
         }
     </style>
 </head>
@@ -53,50 +73,54 @@
     }
     ?>
 
-    <div class="mx-auto flex min-h-screen w-full max-w-7xl gap-6 px-4 pb-24 pt-4 sm:px-6 lg:px-8 lg:pb-8">
+    <div class="mx-auto flex min-h-screen w-full max-w-[1700px] gap-6 px-4 pb-24 pt-4 sm:px-6 lg:px-8 lg:pb-8">
         <?php if (!empty($current_user)): ?>
-            <aside class="hidden lg:flex lg:w-72 lg:flex-col">
-                <div class="sticky top-4 rounded-[2rem] border border-white/60 bg-white/80 p-4 shadow-soft backdrop-blur">
-                    <div class="rounded-[1.5rem] bg-slate-900 p-5 text-white">
-                        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">Absensi RS</p>
-                        <p class="mt-3 text-xl font-black"><?php echo html_escape($current_user['nama']); ?></p>
-                        <p class="mt-1 text-sm text-slate-300"><?php echo html_escape($current_user['nama_role']); ?></p>
+            <aside class="hidden lg:flex lg:w-72 lg:flex-col xl:w-80">
+                <div class="sticky top-4 overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-soft">
+                    <div class="border-b border-white/10 px-6 pb-6 pt-7">
+                        <p class="text-xs font-semibold uppercase tracking-[0.32em] text-emerald-300">Absensi RS</p>
+                        <p class="mt-4 text-2xl font-black leading-tight"><?php echo html_escape($current_user['nama']); ?></p>
+                        <p class="mt-2 text-sm text-slate-300"><?php echo html_escape($current_user['nama_role']); ?></p>
                         <p class="text-sm text-slate-400"><?php echo html_escape($current_user['nama_unit']); ?></p>
                     </div>
-                    <nav class="mt-4 space-y-2">
+                    <nav class="space-y-1 px-4 py-5">
                         <?php foreach ($menu as $item): ?>
                             <?php $active = strpos($current_route, trim(parse_url($item['url'], PHP_URL_PATH), '/')) !== FALSE; ?>
-                            <a href="<?php echo $item['url']; ?>" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold <?php echo $active ? 'bg-brand-500 text-white shadow-soft' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'; ?>">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+                            <a href="<?php echo $item['url']; ?>" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition <?php echo $active ? 'bg-brand-500 text-white shadow-soft' : 'text-slate-300 hover:bg-white/8 hover:text-white'; ?>">
+                                <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
                                     <path d="<?php echo $item['icon']; ?>"></path>
                                 </svg>
                                 <?php echo html_escape($item['label']); ?>
                             </a>
                         <?php endforeach; ?>
                     </nav>
-                    <a href="<?php echo site_url('auth/logout'); ?>" class="mt-4 flex items-center justify-center rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-200">Logout</a>
+                    <div class="border-t border-white/10 p-4">
+                        <a href="<?php echo site_url('auth/logout'); ?>" class="flex items-center justify-center rounded-2xl bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/15">Logout</a>
+                    </div>
                 </div>
             </aside>
         <?php endif; ?>
 
         <div class="min-w-0 flex-1">
             <?php if (!empty($current_user)): ?>
-                <div class="mb-4 hidden rounded-[2rem] border border-white/60 bg-white/80 p-3 shadow-soft backdrop-blur lg:block">
-                    <div class="grid gap-2" style="grid-template-columns: repeat(<?php echo count($menu); ?>, minmax(0, 1fr));">
-                        <?php foreach ($menu as $item): ?>
-                            <?php $active = strpos($current_route, trim(parse_url($item['url'], PHP_URL_PATH), '/')) !== FALSE; ?>
-                            <a href="<?php echo $item['url']; ?>" class="flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-semibold <?php echo $active ? 'bg-brand-500 text-white shadow-soft' : 'text-slate-600 hover:bg-slate-100'; ?>">
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                                    <path d="<?php echo $item['icon']; ?>"></path>
-                                </svg>
-                                <?php echo html_escape($item['label']); ?>
-                            </a>
-                        <?php endforeach; ?>
+                <div class="admin-shell mb-4 hidden items-center justify-between rounded-[2rem] px-6 py-4 lg:flex">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-brand-600">Control Center</p>
+                        <h1 class="mt-2 text-2xl font-black text-slate-900"><?php echo html_escape($page_title); ?></h1>
+                    </div>
+                    <div class="flex items-center gap-3 rounded-2xl bg-slate-950 px-4 py-3 text-right text-white">
+                        <div>
+                            <p class="text-sm font-semibold"><?php echo html_escape($current_user['nama']); ?></p>
+                            <p class="text-xs text-slate-400"><?php echo html_escape($current_user['nama_role']); ?></p>
+                        </div>
+                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-500 text-sm font-black">
+                            <?php echo html_escape(strtoupper(substr($current_user['nama'], 0, 1))); ?>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>
 
-            <div class="mx-auto flex min-h-screen w-full max-w-5xl flex-col">
+            <div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col">
                 <?php if ($this->session->flashdata('error')): ?>
                     <div class="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                         <?php echo html_escape($this->session->flashdata('error')); ?>

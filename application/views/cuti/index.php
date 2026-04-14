@@ -16,7 +16,7 @@
 
     <div class="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
     <?php if ((int) $current_user['level'] === 1): ?>
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+        <div class="admin-panel rounded-[2rem] p-5">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-bold text-slate-900">Master Jenis Cuti</p>
@@ -88,7 +88,7 @@
         </div>
     <?php endif; ?>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-bold text-slate-900">Saldo per Kategori</p>
@@ -117,7 +117,7 @@
     </div>
 
     <div class="grid gap-4 xl:grid-cols-[1fr_1fr]">
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-bold text-slate-900"><?php echo !empty($editing_request) ? 'Update Pengajuan Cuti' : 'Ajukan Cuti Baru'; ?></p>
@@ -156,7 +156,7 @@
         </form>
     </div>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-bold text-slate-900">Pengajuan Terakhir</p>
@@ -200,7 +200,7 @@
     </div>
 
     <?php if ((int) $current_user['level'] <= 3): ?>
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+        <div class="admin-panel rounded-[2rem] p-5">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-bold text-slate-900">Approval Cuti</p>

@@ -5,7 +5,7 @@
         <p class="mt-2 text-sm text-slate-300">Gabungan laporan absensi, cuti, dan jadwal per bulan.</p>
     </header>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <form method="get" action="<?php echo site_url('laporan'); ?>" class="space-y-4">
             <div class="grid grid-cols-2 gap-3">
                 <div>
@@ -32,7 +32,8 @@
         </div>
     </div>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="grid gap-4 xl:grid-cols-3">
+    <div class="admin-panel rounded-[2rem] p-5">
         <p class="text-sm font-bold text-slate-900">Laporan Absensi</p>
         <div class="mt-4 space-y-3">
             <?php foreach ($attendance_report as $row): ?>
@@ -44,7 +45,7 @@
         </div>
     </div>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <p class="text-sm font-bold text-slate-900">Laporan Cuti</p>
         <div class="mt-4 space-y-3">
             <?php foreach ($leave_report as $row): ?>
@@ -56,7 +57,7 @@
         </div>
     </div>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <p class="text-sm font-bold text-slate-900">Laporan Jadwal</p>
         <div class="mt-4 space-y-3">
             <?php foreach ($schedule_report as $row): ?>
@@ -66,5 +67,6 @@
                 </article>
             <?php endforeach; ?>
         </div>
+    </div>
     </div>
 </section>

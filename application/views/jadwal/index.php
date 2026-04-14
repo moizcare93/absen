@@ -7,7 +7,7 @@
 
     <div class="grid gap-4 xl:grid-cols-[0.95fr_1.35fr]">
     <?php if ((int) $current_user['level'] <= 3): ?>
-        <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+        <div class="admin-panel rounded-[2rem] p-5">
             <p class="text-sm font-bold text-slate-900">Atur Jadwal Pegawai</p>
             <form method="post" action="<?php echo site_url('jadwal/simpan'); ?>" class="mt-4 space-y-4">
                 <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
@@ -46,7 +46,7 @@
         </div>
     <?php endif; ?>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <form method="get" action="<?php echo site_url('jadwal'); ?>" class="space-y-4">
             <div class="grid gap-3 md:grid-cols-2">
                 <div>
@@ -71,7 +71,38 @@
     </div>
 
     <div class="grid gap-4 xl:grid-cols-[1.2fr_0.95fr]">
-    <div class="space-y-3">
+    <div class="hidden xl:block admin-panel rounded-[2rem] overflow-hidden">
+        <div class="border-b border-slate-200 px-6 py-4">
+            <p class="text-sm font-bold text-slate-900">Jadwal Bulanan</p>
+            <p class="text-xs text-slate-500">Tampilan desktop diringkas seperti panel admin.</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-slate-50 text-left text-xs uppercase tracking-[0.16em] text-slate-500">
+                    <tr>
+                        <th class="px-6 py-4">Tanggal</th>
+                        <th class="px-6 py-4">Pegawai</th>
+                        <th class="px-6 py-4">Shift</th>
+                        <th class="px-6 py-4">Jam</th>
+                        <th class="px-6 py-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <?php $rows = (int) $current_user['level'] <= 3 ? $all_schedules : $schedules; ?>
+                    <?php foreach ($rows as $row): ?>
+                        <tr>
+                            <td class="px-6 py-4 font-semibold text-slate-900"><?php echo html_escape($row['tanggal']); ?></td>
+                            <td class="px-6 py-4 text-slate-600"><?php echo html_escape(!empty($row['nama']) ? $row['nama'] : $current_user['nama']); ?></td>
+                            <td class="px-6 py-4 text-slate-600"><?php echo html_escape($row['nama_shift']); ?></td>
+                            <td class="px-6 py-4 text-slate-600"><?php echo html_escape(substr($row['jam_masuk'], 0, 5)); ?> - <?php echo html_escape(substr($row['jam_keluar'], 0, 5)); ?></td>
+                            <td class="px-6 py-4"><span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-600"><?php echo html_escape($row['status']); ?></span></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="space-y-3 xl:hidden">
         <?php $rows = (int) $current_user['level'] <= 3 ? $all_schedules : $schedules; ?>
         <?php if (!empty($rows)): ?>
             <?php foreach ($rows as $row): ?>
@@ -96,7 +127,7 @@
         <?php endif; ?>
     </div>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="admin-panel rounded-[2rem] p-5">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm font-bold text-slate-900">Cuti Bulan Ini</p>
