@@ -83,4 +83,66 @@ class Absensi_model extends CI_Model
                 'catatan' => $payload['catatan'],
             ));
     }
+
+    public function history(array $viewer, $month = NULL, $pegawai_id = NULL)
+    {
+        $month = $month ?: date('Y-m');
+        $start = $month . '-01';
+        $end = date('Y-m-t', strtotime($start));
+
+        $this->db
+            ->select('tb_absensi.id, tb_absensi.tanggal, tb_absensi.jam_masuk, tb_absensi.jam_keluar, tb_absensi.status, tb_absensi.catatan, tb_pegawai.nama, tb_pegawai.nip, tb_units.nama_unit')
+            ->from('tb_absensi')
+            ->join('tb_pegawai', 'tb_pegawai.id = tb_absensi.pegawai_id')
+            ->join('tb_units', 'tb_units.id = tb_pegawai.unit_id', 'left')
+            ->where('tb_absensi.deleted_at', NULL)
+            ->where('tb_absensi.tanggal >=', $start)
+            ->where('tb_absensi.tanggal <=', $end);
+
+        if ((int) $viewer['level'] >= 4) {
+            $this->db->where('tb_absensi.pegawai_id', (int) $viewer['pegawai_id']);
+        } elseif ((int) $viewer['level'] === 3) {
+            $this->db->where('tb_pegawai.unit_id', (int) $viewer['unit_id']);
+        }
+
+        if ($pegawai_id) {
+            $this->db->where('tb_absensi.pegawai_id', (int) $pegawai_id);
+        }
+
+        return $this->db->order_by('tb_absensi.tanggal', 'DESC')->get()->result_array();
+    }
+
+    public function summary(array $viewer, $month = NULL, $pegawai_id = NULL)
+    {
+        $rows = $this->history($viewer, $month, $pegawai_id);
+        $summary = array(
+            'HADIR' => 0,
+            'TERLAMBAT' => 0,
+            'IZIN' => 0,
+            'CUTI' => 0,
+            'ABSEN' => 0,
+            'total' => 0,
+        );
+
+        foreach ($rows as $row) {
+            $status = strtoupper($row['status']);
+            if (isset($summary[$status])) {
+                $summary[$status]++;
+            }
+            $summary['total']++;
+        }
+
+        return $summary;
+    }
+
+    public function employees(array $viewer)
+    {
+        $this->db->select('id, nama, nip')->from('tb_pegawai')->where('deleted_at', NULL)->where('status', 'AKTIF');
+
+        if ((int) $viewer['level'] === 3) {
+            $this->db->where('unit_id', (int) $viewer['unit_id']);
+        }
+
+        return $this->db->order_by('nama', 'ASC')->get()->result_array();
+    }
 }

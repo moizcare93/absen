@@ -36,4 +36,41 @@ class Dashboard_model extends CI_Model
             'leave_balance' => $leave_balance,
         );
     }
+
+    public function admin_snapshot(array $viewer)
+    {
+        if ((int) $viewer['level'] > 3) {
+            return array();
+        }
+
+        $this->db->from('tb_pegawai')->where('deleted_at', NULL)->where('status', 'AKTIF');
+        if ((int) $viewer['level'] === 3) {
+            $this->db->where('unit_id', (int) $viewer['unit_id']);
+        }
+        $employees = (int) $this->db->count_all_results();
+
+        $this->db->from('tb_cuti')
+            ->join('tb_pegawai', 'tb_pegawai.id = tb_cuti.pegawai_id')
+            ->where('tb_cuti.deleted_at', NULL)
+            ->where_in('tb_cuti.status', array('PENDING', 'APPROVED_UNIT'));
+        if ((int) $viewer['level'] === 3) {
+            $this->db->where('tb_pegawai.unit_id', (int) $viewer['unit_id']);
+        }
+        $pending_leave = (int) $this->db->count_all_results();
+
+        $this->db->from('tb_absensi')
+            ->join('tb_pegawai', 'tb_pegawai.id = tb_absensi.pegawai_id')
+            ->where('tb_absensi.tanggal', date('Y-m-d'))
+            ->where('tb_absensi.deleted_at', NULL);
+        if ((int) $viewer['level'] === 3) {
+            $this->db->where('tb_pegawai.unit_id', (int) $viewer['unit_id']);
+        }
+        $attendance_today = (int) $this->db->count_all_results();
+
+        return array(
+            'employees' => $employees,
+            'pending_leave' => $pending_leave,
+            'attendance_today' => $attendance_today,
+        );
+    }
 }

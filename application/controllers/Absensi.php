@@ -16,6 +16,8 @@ class Absensi extends Auth_Controller
     {
         $user = $this->current_user();
         $reference_location = $this->Absensi_model->reference_location((int) $user['pegawai_id']);
+        $month = $this->input->get('bulan', TRUE) ?: date('Y-m');
+        $pegawai_id = (int) $this->input->get('pegawai_id');
 
         $this->render('absensi/index', array(
             'page_title' => 'Absensi',
@@ -25,6 +27,11 @@ class Absensi extends Auth_Controller
             'office_latitude' => !empty($reference_location['latitude']) ? $reference_location['latitude'] : $this->config->item('office_latitude'),
             'office_longitude' => !empty($reference_location['longitude']) ? $reference_location['longitude'] : $this->config->item('office_longitude'),
             'schedule_today' => $this->Absensi_model->active_schedule((int) $user['pegawai_id'], date('Y-m-d')),
+            'history_month' => $month,
+            'selected_pegawai_id' => $pegawai_id,
+            'attendance_history' => $this->Absensi_model->history($user, $month, $pegawai_id),
+            'attendance_summary' => $this->Absensi_model->summary($user, $month, $pegawai_id),
+            'employees' => $this->Absensi_model->employees($user),
         ));
     }
 

@@ -87,6 +87,78 @@
             </form>
         </div>
     </div>
+
+    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-bold text-slate-900">Rekap Absensi</p>
+                <p class="text-xs text-slate-500">Filter bulanan untuk riwayat pribadi atau seluruh unit bila Anda admin.</p>
+            </div>
+        </div>
+
+        <form method="get" action="<?php echo site_url('absensi'); ?>" class="mt-4 space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">Bulan</label>
+                    <input type="month" name="bulan" value="<?php echo html_escape($history_month); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                </div>
+                <?php if ((int) $current_user['level'] <= 3): ?>
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">Pegawai</label>
+                        <select name="pegawai_id" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                            <option value="">Semua pegawai</option>
+                            <?php foreach ($employees as $employee): ?>
+                                <option value="<?php echo (int) $employee['id']; ?>" <?php echo (string) $selected_pegawai_id === (string) $employee['id'] ? 'selected' : ''; ?>><?php echo html_escape($employee['nama']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <button type="submit" class="w-full rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-700">Tampilkan Rekap</button>
+        </form>
+
+        <div class="mt-4 grid grid-cols-3 gap-3">
+            <div class="rounded-2xl bg-emerald-50 p-4">
+                <p class="text-xs text-emerald-700">Hadir</p>
+                <p class="mt-2 text-2xl font-black text-emerald-900"><?php echo (int) $attendance_summary['HADIR']; ?></p>
+            </div>
+            <div class="rounded-2xl bg-amber-50 p-4">
+                <p class="text-xs text-amber-700">Terlambat</p>
+                <p class="mt-2 text-2xl font-black text-amber-900"><?php echo (int) $attendance_summary['TERLAMBAT']; ?></p>
+            </div>
+            <div class="rounded-2xl bg-slate-100 p-4">
+                <p class="text-xs text-slate-600">Total Data</p>
+                <p class="mt-2 text-2xl font-black text-slate-900"><?php echo (int) $attendance_summary['total']; ?></p>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-3">
+            <?php if (!empty($attendance_history)): ?>
+                <?php foreach ($attendance_history as $row): ?>
+                    <article class="rounded-2xl bg-slate-50 p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-bold text-slate-900"><?php echo html_escape($row['tanggal']); ?></p>
+                                <?php if (!empty($row['nama'])): ?>
+                                    <p class="mt-1 text-xs text-slate-500"><?php echo html_escape($row['nama']); ?> • <?php echo html_escape($row['nama_unit']); ?></p>
+                                <?php endif; ?>
+                            </div>
+                            <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-600"><?php echo html_escape($row['status']); ?></span>
+                        </div>
+                        <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-slate-600">
+                            <div class="rounded-2xl bg-white px-4 py-3">Masuk<br><span class="mt-1 block text-sm font-bold text-slate-900"><?php echo html_escape(!empty($row['jam_masuk']) ? $row['jam_masuk'] : '-'); ?></span></div>
+                            <div class="rounded-2xl bg-white px-4 py-3">Keluar<br><span class="mt-1 block text-sm font-bold text-slate-900"><?php echo html_escape(!empty($row['jam_keluar']) ? $row['jam_keluar'] : '-'); ?></span></div>
+                        </div>
+                        <?php if (!empty($row['catatan'])): ?>
+                            <p class="mt-3 text-xs leading-5 text-slate-600"><?php echo html_escape($row['catatan']); ?></p>
+                        <?php endif; ?>
+                    </article>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p class="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">Belum ada data absensi pada bulan ini.</p>
+            <?php endif; ?>
+        </div>
+    </div>
 </section>
 
 <script>

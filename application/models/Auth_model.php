@@ -9,9 +9,11 @@ class Auth_model extends CI_Model
             tb_users.id,
             tb_users.email,
             tb_users.password,
+            tb_users.role_id,
             tb_roles.nama_role,
             tb_roles.level,
             tb_pegawai.id AS pegawai_id,
+            tb_pegawai.unit_id,
             tb_pegawai.nama,
             tb_pegawai.tipe_kerja,
             tb_units.nama_unit

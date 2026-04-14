@@ -17,6 +17,7 @@ class Dashboard extends Auth_Controller
         $this->render('dashboard/index', array(
             'page_title' => 'Dashboard',
             'snapshot' => $snapshot,
+            'admin_snapshot' => $this->Dashboard_model->admin_snapshot($user),
         ));
     }
 }

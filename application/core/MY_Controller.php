@@ -17,6 +17,13 @@ class MY_Controller extends CI_Controller
         return $this->session->userdata('auth_user');
     }
 
+    protected function is_admin_user()
+    {
+        $user = $this->current_user();
+
+        return $user && (int) $user['level'] <= 3;
+    }
+
     protected function render($view, $data = array())
     {
         $data['current_user'] = $this->current_user();

@@ -53,15 +53,20 @@
 
     <?php if (!empty($current_user)): ?>
         <nav class="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 px-3 pb-safe pt-2 backdrop-blur">
-            <div class="mx-auto grid max-w-md grid-cols-4 gap-2">
-                <?php
-                $menu = array(
-                    array('label' => 'Home', 'url' => site_url('dashboard'), 'icon' => 'M3 12h18M12 3v18'),
-                    array('label' => 'Absen', 'url' => site_url('absensi'), 'icon' => 'M12 6v6l4 2'),
-                    array('label' => 'Jadwal', 'url' => site_url('jadwal'), 'icon' => 'M8 2v4M16 2v4M3 10h18'),
-                    array('label' => 'Cuti', 'url' => site_url('cuti'), 'icon' => 'M4 7h16M4 12h16M4 17h10'),
-                );
-                ?>
+            <?php
+            $menu = array(
+                array('label' => 'Home', 'url' => site_url('dashboard'), 'icon' => 'M3 12h18M12 3v18'),
+                array('label' => 'Absen', 'url' => site_url('absensi'), 'icon' => 'M12 6v6l4 2'),
+                array('label' => 'Jadwal', 'url' => site_url('jadwal'), 'icon' => 'M8 2v4M16 2v4M3 10h18'),
+                array('label' => 'Cuti', 'url' => site_url('cuti'), 'icon' => 'M4 7h16M4 12h16M4 17h10'),
+            );
+
+            if ((int) $current_user['level'] <= 3) {
+                $menu[] = array('label' => 'Pegawai', 'url' => site_url('pegawai'), 'icon' => 'M12 12a4 4 0 1 0 0.001-0.001M6 20a6 6 0 0 1 12 0');
+                $menu[] = array('label' => 'Lapor', 'url' => site_url('laporan'), 'icon' => 'M5 12h14M5 7h14M5 17h10');
+            }
+            ?>
+            <div class="mx-auto grid max-w-md gap-2" style="grid-template-columns: repeat(<?php echo count($menu); ?>, minmax(0, 1fr));">
                 <?php foreach ($menu as $item): ?>
                     <?php $active = strpos($current_route, trim(parse_url($item['url'], PHP_URL_PATH), '/')) !== FALSE; ?>
                     <a href="<?php echo $item['url']; ?>" class="flex flex-col items-center justify-center rounded-2xl px-2 py-3 text-xs font-semibold <?php echo $active ? 'bg-brand-500 text-white shadow-soft' : 'text-slate-500'; ?>">

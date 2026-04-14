@@ -21,6 +21,23 @@
  </header>
 
 <section class="mt-4 space-y-4">
+    <?php if (!empty($admin_snapshot)): ?>
+        <div class="grid grid-cols-3 gap-3">
+            <div class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft">
+                <p class="text-xs text-slate-500">Pegawai Aktif</p>
+                <p class="mt-2 text-2xl font-black text-slate-900"><?php echo (int) $admin_snapshot['employees']; ?></p>
+            </div>
+            <div class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft">
+                <p class="text-xs text-slate-500">Cuti Pending</p>
+                <p class="mt-2 text-2xl font-black text-slate-900"><?php echo (int) $admin_snapshot['pending_leave']; ?></p>
+            </div>
+            <div class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft">
+                <p class="text-xs text-slate-500">Absen Hari Ini</p>
+                <p class="mt-2 text-2xl font-black text-slate-900"><?php echo (int) $admin_snapshot['attendance_today']; ?></p>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
         <div class="flex items-center justify-between">
             <div>
@@ -31,6 +48,10 @@
         <div class="mt-4 grid grid-cols-2 gap-3">
             <a href="<?php echo site_url('absensi'); ?>" class="rounded-2xl bg-brand-500 px-4 py-4 text-sm font-bold text-white">Absen Sekarang</a>
             <a href="<?php echo site_url('cuti'); ?>" class="rounded-2xl bg-slate-100 px-4 py-4 text-sm font-bold text-slate-700">Ajukan Cuti</a>
+            <?php if ((int) $current_user['level'] <= 3): ?>
+                <a href="<?php echo site_url('pegawai'); ?>" class="rounded-2xl bg-slate-100 px-4 py-4 text-sm font-bold text-slate-700">Kelola Pegawai</a>
+                <a href="<?php echo site_url('laporan'); ?>" class="rounded-2xl bg-slate-100 px-4 py-4 text-sm font-bold text-slate-700">Lihat Laporan</a>
+            <?php endif; ?>
         </div>
     </div>
 
