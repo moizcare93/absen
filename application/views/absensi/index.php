@@ -2,48 +2,82 @@
     <header class="rounded-[2rem] bg-slate-900 p-5 text-white shadow-soft">
         <p class="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">Absensi</p>
         <h1 class="mt-3 text-2xl font-black">Check-in Mobile</h1>
-        <p class="mt-2 text-sm text-slate-300">Tampilan difokuskan untuk kamera HP, lokasi GPS, dan tombol aksi besar.</p>
+        <p class="mt-2 text-sm text-slate-300">Tombol aksi utama dibuat selalu dekat jangkauan ibu jari agar check-in lebih cepat.</p>
     </header>
 
     <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
-        <div class="rounded-[1.75rem] bg-slate-950 p-3">
-            <div class="aspect-[3/4] rounded-[1.5rem] border border-white/10 bg-gradient-to-b from-slate-800 to-slate-950 p-4 text-white">
-                <div class="flex h-full flex-col justify-between">
-                    <div class="flex items-center justify-between">
-                        <span id="camera-badge" class="rounded-full bg-amber-400/15 px-3 py-1 text-xs font-semibold text-amber-300">Menyalakan kamera</span>
-                        <span class="text-xs text-slate-300">640x480</span>
-                    </div>
-                    <div class="relative overflow-hidden rounded-[1.25rem] border border-dashed border-white/25 bg-slate-900">
-                        <video id="attendance-video" class="aspect-[3/4] w-full object-cover" autoplay playsinline muted></video>
-                        <canvas id="attendance-canvas" class="hidden"></canvas>
-                        <img id="attendance-preview" alt="Preview foto absensi" class="hidden aspect-[3/4] w-full object-cover">
-                        <div id="camera-placeholder" class="absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-slate-300">
-                            Meminta akses kamera browser untuk mengambil foto absensi.
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3 text-center text-xs">
-                        <div class="rounded-2xl bg-white/5 px-3 py-2">
-                            Radius max<br><span class="mt-1 block text-sm font-bold text-white"><?php echo html_escape($allowed_radius); ?> m</span>
-                        </div>
-                        <div class="rounded-2xl bg-white/5 px-3 py-2">
-                            Status hari ini<br><span class="mt-1 block text-sm font-bold text-white"><?php echo html_escape(isset($attendance_today['status']) ? $attendance_today['status'] : 'BELUM ABSEN'); ?></span>
-                        </div>
-                    </div>
+        <div class="rounded-[1.75rem] bg-slate-950 p-3 text-white">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-200">Status Cepat</p>
+                    <p class="mt-2 text-lg font-black"><?php echo html_escape(isset($attendance_today['status']) ? $attendance_today['status'] : 'BELUM ABSEN'); ?></p>
                 </div>
+                <span id="camera-badge" class="rounded-full bg-amber-400/15 px-3 py-1 text-xs font-semibold text-amber-300">Menyalakan kamera</span>
+            </div>
+
+            <div class="mt-4 grid grid-cols-3 gap-2 text-center text-[11px]">
+                <div class="rounded-2xl bg-white/5 px-3 py-2">
+                    Radius<br><span class="mt-1 block text-sm font-bold text-white"><?php echo html_escape($allowed_radius); ?> m</span>
+                </div>
+                <div class="rounded-2xl bg-white/5 px-3 py-2">
+                    Masuk<br><span class="mt-1 block text-sm font-bold text-white"><?php echo html_escape(!empty($attendance_today['jam_masuk']) ? substr($attendance_today['jam_masuk'], 11, 5) : '--:--'); ?></span>
+                </div>
+                <div class="rounded-2xl bg-white/5 px-3 py-2">
+                    Keluar<br><span class="mt-1 block text-sm font-bold text-white"><?php echo html_escape(!empty($attendance_today['jam_keluar']) ? substr($attendance_today['jam_keluar'], 11, 5) : '--:--'); ?></span>
+                </div>
+            </div>
+
+            <div class="mt-4 relative overflow-hidden rounded-[1.25rem] border border-dashed border-white/25 bg-slate-900">
+                <video id="attendance-video" class="aspect-[4/5] w-full object-cover" autoplay playsinline muted></video>
+                <canvas id="attendance-canvas" class="hidden"></canvas>
+                <img id="attendance-preview" alt="Preview foto absensi" class="hidden aspect-[4/5] w-full object-cover">
+                <div id="camera-placeholder" class="absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-slate-300">
+                    Meminta akses kamera browser untuk mengambil foto absensi.
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky bottom-20 z-10 mt-4 rounded-[1.75rem] border border-slate-200 bg-white/95 p-3 shadow-soft backdrop-blur">
+            <div class="grid grid-cols-2 gap-3">
+                <form id="checkin-form" method="post" action="<?php echo site_url('absensi/masuk'); ?>">
+                    <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                    <input type="hidden" name="latitude">
+                    <input type="hidden" name="longitude">
+                    <input type="hidden" name="photo_data">
+                    <input type="hidden" name="catatan">
+                    <button type="submit" class="w-full rounded-2xl bg-brand-500 px-4 py-4 text-sm font-black text-white shadow-soft disabled:cursor-not-allowed disabled:bg-slate-300" <?php echo !empty($attendance_today['jam_masuk']) ? 'disabled' : ''; ?>>
+                        <?php echo !empty($attendance_today['jam_masuk']) ? 'Masuk Tercatat' : 'Absen Masuk'; ?>
+                    </button>
+                </form>
+
+                <form id="checkout-form" method="post" action="<?php echo site_url('absensi/pulang'); ?>">
+                    <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                    <input type="hidden" name="latitude">
+                    <input type="hidden" name="longitude">
+                    <input type="hidden" name="photo_data">
+                    <input type="hidden" name="catatan">
+                    <button type="submit" class="w-full rounded-2xl bg-slate-100 px-4 py-4 text-sm font-bold text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400" <?php echo empty($attendance_today['jam_masuk']) || !empty($attendance_today['jam_keluar']) ? 'disabled' : ''; ?>>
+                        <?php echo !empty($attendance_today['jam_keluar']) ? 'Keluar Tercatat' : 'Absen Keluar'; ?>
+                    </button>
+                </form>
+            </div>
+
+            <div class="mt-3 grid grid-cols-2 gap-3">
+                <button id="capture-button" type="button" class="rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-700">Ambil Ulang Foto</button>
+                <button id="refresh-location-button" type="button" class="rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-700">Refresh GPS</button>
             </div>
         </div>
 
         <div class="mt-4 space-y-3">
             <div class="rounded-2xl bg-slate-50 p-4">
-                <div class="flex items-center justify-between">
+                <div class="flex items-start justify-between gap-3">
                     <div>
                         <p class="text-sm font-bold text-slate-900"><?php echo html_escape(!empty($reference_location['nama_lokasi']) ? $reference_location['nama_lokasi'] : 'GPS Rumah Sakit'); ?></p>
-                        <p class="text-xs text-slate-500">Titik acuan absensi utama</p>
+                        <p class="mt-1 text-xs text-slate-500">Lat <?php echo html_escape($office_latitude); ?>, Lng <?php echo html_escape($office_longitude); ?></p>
                     </div>
                     <span id="gps-badge" class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Menunggu izin</span>
                 </div>
-                <p class="mt-3 text-xs text-slate-500">Lat <?php echo html_escape($office_latitude); ?>, Lng <?php echo html_escape($office_longitude); ?></p>
-                <p id="gps-status" class="mt-2 text-xs text-slate-500">Lokasi perangkat belum dibaca.</p>
+                <p id="gps-status" class="mt-3 text-xs text-slate-500">Lokasi perangkat belum dibaca.</p>
             </div>
 
             <?php if (!empty($schedule_today)): ?>
@@ -54,37 +88,12 @@
                 </div>
             <?php endif; ?>
 
-            <div class="rounded-2xl border border-slate-200 p-4">
-                <label class="mb-2 block text-sm font-semibold text-slate-700">Catatan</label>
-                <textarea id="attendance-note" rows="3" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none ring-brand-500 transition focus:border-brand-500 focus:bg-white focus:ring-2" placeholder="Opsional, mis. kunjungan unit luar atau pergantian shift."><?php echo set_value('catatan'); ?></textarea>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <button id="capture-button" type="button" class="rounded-2xl bg-slate-100 px-4 py-4 text-sm font-bold text-slate-700">Ambil Ulang Foto</button>
-                <button id="refresh-location-button" type="button" class="rounded-2xl bg-slate-100 px-4 py-4 text-sm font-bold text-slate-700">Refresh GPS</button>
-            </div>
-
-            <form id="checkin-form" method="post" action="<?php echo site_url('absensi/masuk'); ?>">
-                <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
-                <input type="hidden" name="latitude">
-                <input type="hidden" name="longitude">
-                <input type="hidden" name="photo_data">
-                <input type="hidden" name="catatan">
-                <button type="submit" class="w-full rounded-2xl bg-brand-500 px-4 py-4 text-base font-black text-white shadow-soft disabled:cursor-not-allowed disabled:bg-slate-300" <?php echo !empty($attendance_today['jam_masuk']) ? 'disabled' : ''; ?>>
-                    <?php echo !empty($attendance_today['jam_masuk']) ? 'Absensi Masuk Sudah Tercatat' : 'Ambil Foto & Absen Masuk'; ?>
-                </button>
-            </form>
-
-            <form id="checkout-form" method="post" action="<?php echo site_url('absensi/pulang'); ?>">
-                <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
-                <input type="hidden" name="latitude">
-                <input type="hidden" name="longitude">
-                <input type="hidden" name="photo_data">
-                <input type="hidden" name="catatan">
-                <button type="submit" class="w-full rounded-2xl bg-slate-100 px-4 py-4 text-base font-bold text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400" <?php echo empty($attendance_today['jam_masuk']) || !empty($attendance_today['jam_keluar']) ? 'disabled' : ''; ?>>
-                    <?php echo !empty($attendance_today['jam_keluar']) ? 'Absensi Keluar Sudah Tercatat' : 'Absen Keluar'; ?>
-                </button>
-            </form>
+            <details class="rounded-2xl border border-slate-200 bg-white p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-700">Tambahkan catatan absensi</summary>
+                <div class="mt-3">
+                    <textarea id="attendance-note" rows="3" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none ring-brand-500 transition focus:border-brand-500 focus:bg-white focus:ring-2" placeholder="Opsional, mis. kunjungan unit luar atau pergantian shift."><?php echo set_value('catatan'); ?></textarea>
+                </div>
+            </details>
         </div>
     </div>
 
