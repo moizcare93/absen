@@ -1,0 +1,241 @@
+<section class="space-y-4">
+    <header class="rounded-[2rem] bg-slate-900 p-5 text-white shadow-soft">
+        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">Absensi</p>
+        <h1 class="mt-3 text-2xl font-black">Check-in Mobile</h1>
+        <p class="mt-2 text-sm text-slate-300">Tampilan difokuskan untuk kamera HP, lokasi GPS, dan tombol aksi besar.</p>
+    </header>
+
+    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+        <div class="rounded-[1.75rem] bg-slate-950 p-3">
+            <div class="aspect-[3/4] rounded-[1.5rem] border border-white/10 bg-gradient-to-b from-slate-800 to-slate-950 p-4 text-white">
+                <div class="flex h-full flex-col justify-between">
+                    <div class="flex items-center justify-between">
+                        <span id="camera-badge" class="rounded-full bg-amber-400/15 px-3 py-1 text-xs font-semibold text-amber-300">Menyalakan kamera</span>
+                        <span class="text-xs text-slate-300">640x480</span>
+                    </div>
+                    <div class="relative overflow-hidden rounded-[1.25rem] border border-dashed border-white/25 bg-slate-900">
+                        <video id="attendance-video" class="aspect-[3/4] w-full object-cover" autoplay playsinline muted></video>
+                        <canvas id="attendance-canvas" class="hidden"></canvas>
+                        <img id="attendance-preview" alt="Preview foto absensi" class="hidden aspect-[3/4] w-full object-cover">
+                        <div id="camera-placeholder" class="absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-slate-300">
+                            Meminta akses kamera browser untuk mengambil foto absensi.
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 text-center text-xs">
+                        <div class="rounded-2xl bg-white/5 px-3 py-2">
+                            Radius max<br><span class="mt-1 block text-sm font-bold text-white"><?php echo html_escape($allowed_radius); ?> m</span>
+                        </div>
+                        <div class="rounded-2xl bg-white/5 px-3 py-2">
+                            Status hari ini<br><span class="mt-1 block text-sm font-bold text-white"><?php echo html_escape(isset($attendance_today['status']) ? $attendance_today['status'] : 'BELUM ABSEN'); ?></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-3">
+            <div class="rounded-2xl bg-slate-50 p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-slate-900"><?php echo html_escape(!empty($reference_location['nama_lokasi']) ? $reference_location['nama_lokasi'] : 'GPS Rumah Sakit'); ?></p>
+                        <p class="text-xs text-slate-500">Titik acuan absensi utama</p>
+                    </div>
+                    <span id="gps-badge" class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Menunggu izin</span>
+                </div>
+                <p class="mt-3 text-xs text-slate-500">Lat <?php echo html_escape($office_latitude); ?>, Lng <?php echo html_escape($office_longitude); ?></p>
+                <p id="gps-status" class="mt-2 text-xs text-slate-500">Lokasi perangkat belum dibaca.</p>
+            </div>
+
+            <?php if (!empty($schedule_today)): ?>
+                <div class="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                    Jadwal hari ini:
+                    <span class="font-semibold text-slate-900"><?php echo html_escape($schedule_today['nama_shift']); ?></span>
+                    <?php echo html_escape(substr($schedule_today['jam_masuk'], 0, 5)); ?> - <?php echo html_escape(substr($schedule_today['jam_keluar'], 0, 5)); ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="rounded-2xl border border-slate-200 p-4">
+                <label class="mb-2 block text-sm font-semibold text-slate-700">Catatan</label>
+                <textarea id="attendance-note" rows="3" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none ring-brand-500 transition focus:border-brand-500 focus:bg-white focus:ring-2" placeholder="Opsional, mis. kunjungan unit luar atau pergantian shift."><?php echo set_value('catatan'); ?></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button id="capture-button" type="button" class="rounded-2xl bg-slate-100 px-4 py-4 text-sm font-bold text-slate-700">Ambil Ulang Foto</button>
+                <button id="refresh-location-button" type="button" class="rounded-2xl bg-slate-100 px-4 py-4 text-sm font-bold text-slate-700">Refresh GPS</button>
+            </div>
+
+            <form id="checkin-form" method="post" action="<?php echo site_url('absensi/masuk'); ?>">
+                <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                <input type="hidden" name="latitude">
+                <input type="hidden" name="longitude">
+                <input type="hidden" name="photo_data">
+                <input type="hidden" name="catatan">
+                <button type="submit" class="w-full rounded-2xl bg-brand-500 px-4 py-4 text-base font-black text-white shadow-soft disabled:cursor-not-allowed disabled:bg-slate-300" <?php echo !empty($attendance_today['jam_masuk']) ? 'disabled' : ''; ?>>
+                    <?php echo !empty($attendance_today['jam_masuk']) ? 'Absensi Masuk Sudah Tercatat' : 'Ambil Foto & Absen Masuk'; ?>
+                </button>
+            </form>
+
+            <form id="checkout-form" method="post" action="<?php echo site_url('absensi/pulang'); ?>">
+                <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                <input type="hidden" name="latitude">
+                <input type="hidden" name="longitude">
+                <input type="hidden" name="photo_data">
+                <input type="hidden" name="catatan">
+                <button type="submit" class="w-full rounded-2xl bg-slate-100 px-4 py-4 text-base font-bold text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400" <?php echo empty($attendance_today['jam_masuk']) || !empty($attendance_today['jam_keluar']) ? 'disabled' : ''; ?>>
+                    <?php echo !empty($attendance_today['jam_keluar']) ? 'Absensi Keluar Sudah Tercatat' : 'Absen Keluar'; ?>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var forms = [document.getElementById('checkin-form'), document.getElementById('checkout-form')];
+    var video = document.getElementById('attendance-video');
+    var canvas = document.getElementById('attendance-canvas');
+    var preview = document.getElementById('attendance-preview');
+    var placeholder = document.getElementById('camera-placeholder');
+    var cameraBadge = document.getElementById('camera-badge');
+    var gpsBadge = document.getElementById('gps-badge');
+    var gpsStatus = document.getElementById('gps-status');
+    var noteField = document.getElementById('attendance-note');
+    var captureButton = document.getElementById('capture-button');
+    var refreshLocationButton = document.getElementById('refresh-location-button');
+    var latestPhoto = '';
+    var latestCoords = null;
+
+    function syncForms() {
+        forms.forEach(function (form) {
+            if (!form) {
+                return;
+            }
+
+            form.querySelector('input[name="photo_data"]').value = latestPhoto;
+            form.querySelector('input[name="catatan"]').value = noteField.value;
+            form.querySelector('input[name="latitude"]').value = latestCoords ? latestCoords.latitude : '';
+            form.querySelector('input[name="longitude"]').value = latestCoords ? latestCoords.longitude : '';
+        });
+    }
+
+    function setGpsState(kind, message) {
+        gpsStatus.textContent = message;
+        gpsBadge.className = 'rounded-full px-3 py-1 text-xs font-semibold';
+
+        if (kind === 'ready') {
+            gpsBadge.textContent = 'GPS siap';
+            gpsBadge.classList.add('bg-emerald-100', 'text-emerald-700');
+            return;
+        }
+
+        if (kind === 'error') {
+            gpsBadge.textContent = 'GPS gagal';
+            gpsBadge.classList.add('bg-red-100', 'text-red-700');
+            return;
+        }
+
+        gpsBadge.textContent = 'Memuat GPS';
+        gpsBadge.classList.add('bg-amber-100', 'text-amber-700');
+    }
+
+    function requestLocation() {
+        if (!navigator.geolocation) {
+            setGpsState('error', 'Browser tidak mendukung geolocation.');
+            return;
+        }
+
+        setGpsState('loading', 'Mengambil koordinat perangkat...');
+        navigator.geolocation.getCurrentPosition(function (position) {
+            latestCoords = {
+                latitude: position.coords.latitude.toFixed(7),
+                longitude: position.coords.longitude.toFixed(7)
+            };
+            syncForms();
+            setGpsState('ready', 'Lokasi terdeteksi: ' + latestCoords.latitude + ', ' + latestCoords.longitude);
+        }, function (error) {
+            setGpsState('error', 'Izin lokasi ditolak atau GPS tidak tersedia: ' + error.message);
+        }, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        });
+    }
+
+    function captureFrame() {
+        if (!video.videoWidth || !video.videoHeight) {
+            cameraBadge.textContent = 'Kamera belum siap';
+            cameraBadge.className = 'rounded-full bg-red-400/15 px-3 py-1 text-xs font-semibold text-red-300';
+            return;
+        }
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        latestPhoto = canvas.toDataURL('image/jpeg', 0.85);
+        preview.src = latestPhoto;
+        preview.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        cameraBadge.textContent = 'Foto siap';
+        cameraBadge.className = 'rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-300';
+        syncForms();
+    }
+
+    function startCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            cameraBadge.textContent = 'Kamera tidak didukung';
+            cameraBadge.className = 'rounded-full bg-red-400/15 px-3 py-1 text-xs font-semibold text-red-300';
+            placeholder.textContent = 'Browser ini tidak mendukung akses kamera.';
+            return;
+        }
+
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: 'user',
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            },
+            audio: false
+        }).then(function (stream) {
+            video.srcObject = stream;
+            cameraBadge.textContent = 'Kamera aktif';
+            cameraBadge.className = 'rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-semibold text-emerald-300';
+            placeholder.textContent = 'Tekan "Ambil Ulang Foto" untuk merekam frame terbaru.';
+            video.addEventListener('loadedmetadata', function () {
+                captureFrame();
+            }, { once: true });
+        }).catch(function () {
+            cameraBadge.textContent = 'Izin kamera ditolak';
+            cameraBadge.className = 'rounded-full bg-red-400/15 px-3 py-1 text-xs font-semibold text-red-300';
+            placeholder.textContent = 'Akses kamera ditolak. Izinkan kamera lalu muat ulang halaman.';
+        });
+    }
+
+    forms.forEach(function (form) {
+        if (!form) {
+            return;
+        }
+
+        form.addEventListener('submit', function (event) {
+            syncForms();
+            if (!latestPhoto) {
+                event.preventDefault();
+                alert('Foto absensi belum diambil.');
+                return;
+            }
+
+            if (!latestCoords) {
+                event.preventDefault();
+                alert('Lokasi GPS belum tersedia.');
+            }
+        });
+    });
+
+    noteField.addEventListener('input', syncForms);
+    captureButton.addEventListener('click', captureFrame);
+    refreshLocationButton.addEventListener('click', requestLocation);
+
+    syncForms();
+    startCamera();
+    requestLocation();
+});
+</script>
