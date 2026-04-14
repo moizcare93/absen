@@ -106,6 +106,20 @@ class Cuti_model extends CI_Model
             ->result_array();
     }
 
+    public function find_request($id, $pegawai_id = NULL)
+    {
+        $this->db
+            ->from('tb_cuti')
+            ->where('id', (int) $id)
+            ->where('deleted_at', NULL);
+
+        if ($pegawai_id !== NULL) {
+            $this->db->where('pegawai_id', (int) $pegawai_id);
+        }
+
+        return $this->db->get()->row_array();
+    }
+
     public function pending_approvals(array $viewer)
     {
         $this->db
@@ -153,6 +167,34 @@ class Cuti_model extends CI_Model
             'status' => 'PENDING',
             'catatan' => $data['catatan'],
         ));
+    }
+
+    public function update_request($id, array $data)
+    {
+        $existing = $this->find_request($id, (int) $data['pegawai_id']);
+        if (!$existing || $existing['status'] !== 'PENDING') {
+            return FALSE;
+        }
+
+        $type = $this->find_leave_type($data['jenis_cuti']);
+        if (!$type) {
+            return FALSE;
+        }
+
+        $days = ((strtotime($data['tgl_selesai']) - strtotime($data['tgl_mulai'])) / 86400) + 1;
+        if ($days <= 0) {
+            return FALSE;
+        }
+
+        return $this->db
+            ->where('id', (int) $id)
+            ->where('pegawai_id', (int) $data['pegawai_id'])
+            ->update('tb_cuti', array(
+                'jenis_cuti' => $data['jenis_cuti'],
+                'tgl_mulai' => $data['tgl_mulai'],
+                'tgl_selesai' => $data['tgl_selesai'],
+                'catatan' => $data['catatan'],
+            ));
     }
 
     public function update_request_status($id, $status, array $viewer)
@@ -257,6 +299,22 @@ class Cuti_model extends CI_Model
             ->where('id', (int) $id)
             ->where('kategori', 'cuti_jenis')
             ->delete('tb_konfigurasi');
+    }
+
+    public function delete_request($id, $pegawai_id)
+    {
+        $existing = $this->find_request($id, $pegawai_id);
+        if (!$existing || $existing['status'] !== 'PENDING') {
+            return FALSE;
+        }
+
+        return $this->db
+            ->where('id', (int) $id)
+            ->where('pegawai_id', (int) $pegawai_id)
+            ->update('tb_cuti', array(
+                'deleted_at' => date('Y-m-d H:i:s'),
+                'status' => 'BATAL',
+            ));
     }
 
     public function find_leave_type($kode)

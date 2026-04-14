@@ -68,6 +68,7 @@ $route['cuti/ajukan'] = 'cuti/submit';
 $route['cuti/aksi/(:num)'] = 'cuti/action/$1';
 $route['cuti/jenis/simpan'] = 'cuti/save_type';
 $route['cuti/jenis/hapus/(:num)'] = 'cuti/delete_type/$1';
+$route['cuti/hapus/(:num)'] = 'cuti/delete_request/$1';
 $route['pegawai'] = 'pegawai/index';
 $route['laporan'] = 'laporan/index';
 $route['laporan/export/(:any)'] = 'laporan/export/$1';

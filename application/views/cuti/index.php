@@ -21,40 +21,44 @@
                     <p class="text-sm font-bold text-slate-900">Master Jenis Cuti</p>
                     <p class="text-xs text-slate-500">Super user mengatur kategori cuti yang nanti dipilih oleh pegawai.</p>
                 </div>
+                <?php if (!empty($editing_type)): ?>
+                    <a href="<?php echo site_url('cuti'); ?>" class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700">Batal Edit</a>
+                <?php endif; ?>
             </div>
             <form method="post" action="<?php echo site_url('cuti/jenis/simpan'); ?>" class="mt-4 space-y-4">
                 <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                <input type="hidden" name="id" value="<?php echo html_escape(!empty($editing_type['id']) ? $editing_type['id'] : ''); ?>">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="mb-2 block text-sm font-semibold text-slate-700">Kode</label>
-                        <input type="text" name="kode" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="TAHUNAN">
+                        <input type="text" name="kode" value="<?php echo html_escape(!empty($editing_type['kode']) ? $editing_type['kode'] : ''); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="TAHUNAN">
                     </div>
                     <div>
                         <label class="mb-2 block text-sm font-semibold text-slate-700">Nama Kategori</label>
-                        <input type="text" name="nama" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Cuti Tahunan">
+                        <input type="text" name="nama" value="<?php echo html_escape(!empty($editing_type['nama']) ? $editing_type['nama'] : ''); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Cuti Tahunan">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="mb-2 block text-sm font-semibold text-slate-700">Jatah per Tahun</label>
-                        <input type="number" min="0" name="jatah" value="12" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                        <input type="number" min="0" name="jatah" value="<?php echo html_escape(isset($editing_type['jatah']) ? $editing_type['jatah'] : 12); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
                     </div>
                     <div>
                         <label class="mb-2 block text-sm font-semibold text-slate-700">Keterangan</label>
-                        <input type="text" name="keterangan" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Opsional">
+                        <input type="text" name="keterangan" value="<?php echo html_escape(!empty($editing_type['keterangan']) ? $editing_type['keterangan'] : ''); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Opsional">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <label class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
-                        <input type="checkbox" name="aktif" value="1" checked>
+                        <input type="checkbox" name="aktif" value="1" <?php echo empty($editing_type) || !empty($editing_type['aktif']) ? 'checked' : ''; ?>>
                         Aktif
                     </label>
                     <label class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
-                        <input type="checkbox" name="potong_kuota" value="1" checked>
+                        <input type="checkbox" name="potong_kuota" value="1" <?php echo empty($editing_type) || !empty($editing_type['potong_kuota']) ? 'checked' : ''; ?>>
                         Batasi dengan jatah
                     </label>
                 </div>
-                <button type="submit" class="w-full rounded-2xl bg-brand-500 px-4 py-3 text-sm font-bold text-white">Simpan Jenis Cuti</button>
+                <button type="submit" class="w-full rounded-2xl bg-brand-500 px-4 py-3 text-sm font-bold text-white"><?php echo !empty($editing_type) ? 'Update Jenis Cuti' : 'Simpan Jenis Cuti'; ?></button>
             </form>
 
             <div class="mt-4 space-y-3">
@@ -70,10 +74,13 @@
                             </div>
                             <span class="rounded-full px-3 py-1 text-xs font-semibold <?php echo !empty($type['aktif']) ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'; ?>"><?php echo !empty($type['aktif']) ? 'Aktif' : 'Nonaktif'; ?></span>
                         </div>
-                        <form method="post" action="<?php echo site_url('cuti/jenis/hapus/' . (int) $type['id']); ?>" class="mt-3">
-                            <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
-                            <button type="submit" class="w-full rounded-2xl bg-red-50 px-4 py-3 text-xs font-bold text-red-700" onclick="return confirm('Hapus jenis cuti ini?')">Hapus Jenis Cuti</button>
-                        </form>
+                        <div class="mt-3 grid grid-cols-2 gap-3">
+                            <a href="<?php echo site_url('cuti?edit_type=' . (int) $type['id']); ?>" class="rounded-2xl bg-slate-100 px-4 py-3 text-center text-xs font-bold text-slate-700">Edit Jenis</a>
+                            <form method="post" action="<?php echo site_url('cuti/jenis/hapus/' . (int) $type['id']); ?>">
+                                <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                                <button type="submit" class="w-full rounded-2xl bg-red-50 px-4 py-3 text-xs font-bold text-red-700" onclick="return confirm('Hapus jenis cuti ini?')">Hapus Jenis</button>
+                            </form>
+                        </div>
                     </article>
                 <?php endforeach; ?>
             </div>
@@ -110,35 +117,39 @@
     <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-bold text-slate-900">Ajukan Cuti Baru</p>
+                <p class="text-sm font-bold text-slate-900"><?php echo !empty($editing_request) ? 'Update Pengajuan Cuti' : 'Ajukan Cuti Baru'; ?></p>
                 <p class="text-xs text-slate-500">Alur approval mengikuti role kepala unit dan HR.</p>
             </div>
+            <?php if (!empty($editing_request)): ?>
+                <a href="<?php echo site_url('cuti'); ?>" class="rounded-2xl bg-slate-100 px-4 py-2 text-xs font-bold text-slate-700">Batal Edit</a>
+            <?php endif; ?>
         </div>
         <form method="post" action="<?php echo site_url('cuti/ajukan'); ?>" class="mt-4 space-y-4">
             <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+            <input type="hidden" name="id" value="<?php echo html_escape(!empty($editing_request['id']) ? $editing_request['id'] : ''); ?>">
             <div>
                 <label class="mb-2 block text-sm font-semibold text-slate-700">Jenis Cuti</label>
                 <select name="jenis_cuti" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
                     <?php foreach ($leave_types as $jenis): ?>
-                        <option value="<?php echo html_escape($jenis['kode']); ?>"><?php echo html_escape($jenis['nama'] . ' (' . $jenis['kode'] . ')'); ?></option>
+                        <option value="<?php echo html_escape($jenis['kode']); ?>" <?php echo (!empty($editing_request['jenis_cuti']) && $editing_request['jenis_cuti'] === $jenis['kode']) ? 'selected' : ''; ?>><?php echo html_escape($jenis['nama'] . ' (' . $jenis['kode'] . ')'); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Mulai</label>
-                    <input type="date" name="tgl_mulai" value="<?php echo html_escape(date('Y-m-d')); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                    <input type="date" name="tgl_mulai" value="<?php echo html_escape(!empty($editing_request['tgl_mulai']) ? $editing_request['tgl_mulai'] : date('Y-m-d')); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
                 </div>
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Selesai</label>
-                    <input type="date" name="tgl_selesai" value="<?php echo html_escape(date('Y-m-d')); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                    <input type="date" name="tgl_selesai" value="<?php echo html_escape(!empty($editing_request['tgl_selesai']) ? $editing_request['tgl_selesai'] : date('Y-m-d')); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
                 </div>
             </div>
             <div>
                 <label class="mb-2 block text-sm font-semibold text-slate-700">Catatan</label>
-                <textarea name="catatan" rows="3" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Alasan atau detail pengajuan"></textarea>
+                <textarea name="catatan" rows="3" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Alasan atau detail pengajuan"><?php echo html_escape(!empty($editing_request['catatan']) ? $editing_request['catatan'] : ''); ?></textarea>
             </div>
-            <button type="submit" class="w-full rounded-2xl bg-brand-500 px-4 py-3 text-sm font-bold text-white">Kirim Pengajuan</button>
+            <button type="submit" class="w-full rounded-2xl bg-brand-500 px-4 py-3 text-sm font-bold text-white"><?php echo !empty($editing_request) ? 'Update Pengajuan' : 'Kirim Pengajuan'; ?></button>
         </form>
     </div>
 
@@ -166,6 +177,15 @@
                         <?php endif; ?>
                         <?php if (!empty($row['approver_nama'])): ?>
                             <p class="mt-2 text-xs text-slate-500">Approver: <?php echo html_escape($row['approver_nama']); ?></p>
+                        <?php endif; ?>
+                        <?php if ($row['status'] === 'PENDING'): ?>
+                            <div class="mt-3 grid grid-cols-2 gap-3">
+                                <a href="<?php echo site_url('cuti?edit=' . (int) $row['id']); ?>" class="rounded-2xl bg-slate-100 px-4 py-3 text-center text-xs font-bold text-slate-700">Edit Pengajuan</a>
+                                <form method="post" action="<?php echo site_url('cuti/hapus/' . (int) $row['id']); ?>">
+                                    <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                                    <button type="submit" class="w-full rounded-2xl bg-red-50 px-4 py-3 text-xs font-bold text-red-700" onclick="return confirm('Hapus pengajuan cuti ini?')">Hapus Pengajuan</button>
+                                </form>
+                            </div>
                         <?php endif; ?>
                     </article>
                 <?php endforeach; ?>

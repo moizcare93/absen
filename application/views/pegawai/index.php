@@ -2,7 +2,7 @@
     <header class="rounded-[2rem] bg-slate-900 p-5 text-white shadow-soft">
         <p class="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">Pegawai</p>
         <h1 class="mt-3 text-2xl font-black">Data Master & Akun</h1>
-        <p class="mt-2 text-sm text-slate-300">Atur pegawai, unit kerja, role akses, dan akun login dalam satu layar.</p>
+        <p class="mt-2 text-sm text-slate-300">Menu ini sudah mendukung tambah, update, dan hapus/nonaktifkan pegawai.</p>
     </header>
 
     <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
@@ -123,10 +123,10 @@
                     Status: <?php echo html_escape($employee['status']); ?> • Role: <?php echo html_escape($employee['nama_role'] ? $employee['nama_role'] : 'Belum ada akun'); ?> • Akun: <?php echo !empty($employee['is_active']) ? 'Aktif' : 'Nonaktif'; ?>
                 </div>
                 <div class="mt-3 grid grid-cols-2 gap-3">
-                    <a href="<?php echo site_url('pegawai?edit=' . (int) $employee['id']); ?>" class="rounded-2xl bg-slate-100 px-4 py-3 text-center text-xs font-bold text-slate-700">Edit</a>
+                    <a href="<?php echo site_url('pegawai?edit=' . (int) $employee['id']); ?>" class="rounded-2xl bg-slate-100 px-4 py-3 text-center text-xs font-bold text-slate-700">Update Pegawai</a>
                     <form method="post" action="<?php echo site_url('pegawai/hapus/' . (int) $employee['id']); ?>">
                         <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
-                        <button type="submit" class="w-full rounded-2xl bg-red-50 px-4 py-3 text-xs font-bold text-red-700" onclick="return confirm('Nonaktifkan pegawai ini?')">Nonaktifkan</button>
+                        <button type="submit" class="w-full rounded-2xl bg-red-50 px-4 py-3 text-xs font-bold text-red-700" onclick="return confirm('Hapus/nonaktifkan pegawai ini?')">Hapus Pegawai</button>
                     </form>
                 </div>
             </article>
