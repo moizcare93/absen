@@ -92,4 +92,35 @@
             <div class="rounded-[2rem] border border-dashed border-slate-300 bg-white px-5 py-12 text-center text-sm text-slate-500 shadow-soft">Belum ada jadwal aktif untuk filter yang dipilih.</div>
         <?php endif; ?>
     </div>
+
+    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-bold text-slate-900">Cuti Bulan Ini</p>
+                <p class="text-xs text-slate-500">Menampilkan pengajuan cuti pegawai pada bulan yang dipilih, baik pending maupun yang sudah di-approval.</p>
+            </div>
+        </div>
+
+        <div class="mt-4 space-y-3">
+            <?php if (!empty($leave_requests)): ?>
+                <?php foreach ($leave_requests as $row): ?>
+                    <article class="rounded-2xl bg-slate-50 p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-bold text-slate-900"><?php echo html_escape($row['nama']); ?></p>
+                                <p class="mt-1 text-xs text-slate-500"><?php echo html_escape($row['nama_unit']); ?> • <?php echo html_escape($row['jenis_cuti']); ?></p>
+                                <p class="mt-1 text-xs text-slate-500"><?php echo html_escape($row['tgl_mulai']); ?> s/d <?php echo html_escape($row['tgl_selesai']); ?></p>
+                            </div>
+                            <span class="rounded-full px-3 py-1 text-xs font-semibold <?php echo $row['status'] === 'APPROVED_HR' ? 'bg-emerald-100 text-emerald-700' : ($row['status'] === 'APPROVED_UNIT' ? 'bg-cyan-100 text-cyan-700' : ($row['status'] === 'DITOLAK' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700')); ?>"><?php echo html_escape($row['status']); ?></span>
+                        </div>
+                        <?php if (!empty($row['catatan'])): ?>
+                            <p class="mt-3 text-xs leading-5 text-slate-600"><?php echo html_escape($row['catatan']); ?></p>
+                        <?php endif; ?>
+                    </article>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p class="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">Tidak ada pengajuan cuti pada bulan ini.</p>
+            <?php endif; ?>
+        </div>
+    </div>
 </section>

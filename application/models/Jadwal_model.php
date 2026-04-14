@@ -50,6 +50,35 @@ class Jadwal_model extends CI_Model
         return $this->db->order_by('tb_jadwal.tanggal', 'ASC')->order_by('tb_pegawai.nama', 'ASC')->get()->result_array();
     }
 
+    public function monthly_leave_requests(array $viewer, $month, $pegawai_id = NULL)
+    {
+        $start = $month . '-01';
+        $end = date('Y-m-t', strtotime($start));
+
+        $this->db
+            ->select('tb_cuti.id, tb_cuti.jenis_cuti, tb_cuti.tgl_mulai, tb_cuti.tgl_selesai, tb_cuti.status, tb_cuti.catatan, tb_pegawai.nama, tb_pegawai.nip, tb_units.nama_unit')
+            ->from('tb_cuti')
+            ->join('tb_pegawai', 'tb_pegawai.id = tb_cuti.pegawai_id')
+            ->join('tb_units', 'tb_units.id = tb_pegawai.unit_id', 'left')
+            ->where('tb_cuti.deleted_at', NULL)
+            ->group_start()
+                ->where('tb_cuti.tgl_mulai <=', $end)
+                ->where('tb_cuti.tgl_selesai >=', $start)
+            ->group_end();
+
+        if ((int) $viewer['level'] >= 4) {
+            $this->db->where('tb_cuti.pegawai_id', (int) $viewer['pegawai_id']);
+        } elseif ((int) $viewer['level'] === 3) {
+            $this->db->where('tb_pegawai.unit_id', (int) $viewer['unit_id']);
+        }
+
+        if ($pegawai_id) {
+            $this->db->where('tb_cuti.pegawai_id', (int) $pegawai_id);
+        }
+
+        return $this->db->order_by('tb_cuti.tgl_mulai', 'ASC')->order_by('tb_pegawai.nama', 'ASC')->get()->result_array();
+    }
+
     public function employees(array $viewer)
     {
         $this->db

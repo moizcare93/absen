@@ -11,6 +11,87 @@ class Cuti_model extends CI_Model
             ->row_array();
     }
 
+    public function leave_types($active_only = FALSE)
+    {
+        $this->db
+            ->select('id, config_key, config_value, updated_at')
+            ->from('tb_konfigurasi')
+            ->where('kategori', 'cuti_jenis')
+            ->order_by('config_key', 'ASC');
+
+        $rows = $this->db->get()->result_array();
+        $types = array();
+
+        foreach ($rows as $row) {
+            $decoded = json_decode($row['config_value'], TRUE);
+            if (!is_array($decoded)) {
+                continue;
+            }
+
+            $item = array(
+                'id' => (int) $row['id'],
+                'config_key' => $row['config_key'],
+                'kode' => isset($decoded['kode']) ? $decoded['kode'] : strtoupper($row['config_key']),
+                'nama' => isset($decoded['nama']) ? $decoded['nama'] : $row['config_key'],
+                'jatah' => isset($decoded['jatah']) ? (int) $decoded['jatah'] : 0,
+                'aktif' => !isset($decoded['aktif']) || (int) $decoded['aktif'] === 1,
+                'potong_kuota' => !empty($decoded['potong_kuota']) ? 1 : 0,
+                'keterangan' => isset($decoded['keterangan']) ? $decoded['keterangan'] : '',
+            );
+
+            if ($active_only && !$item['aktif']) {
+                continue;
+            }
+
+            $types[] = $item;
+        }
+
+        return $types;
+    }
+
+    public function leave_type_options()
+    {
+        $options = array();
+        foreach ($this->leave_types(TRUE) as $type) {
+            $options[$type['kode']] = $type;
+        }
+
+        return $options;
+    }
+
+    public function leave_balance_by_type($pegawai_id, $year = NULL)
+    {
+        $year = $year ?: date('Y');
+        $types = $this->leave_type_options();
+        $balances = array();
+
+        foreach ($types as $type) {
+            $used = $this->db
+                ->select('COALESCE(SUM(DATEDIFF(tgl_selesai, tgl_mulai) + 1), 0) AS hari', FALSE)
+                ->from('tb_cuti')
+                ->where('pegawai_id', (int) $pegawai_id)
+                ->where('jenis_cuti', $type['kode'])
+                ->where_in('status', array('PENDING', 'APPROVED_UNIT', 'APPROVED_HR'))
+                ->where('YEAR(tgl_mulai) =', (int) $year, FALSE)
+                ->where('deleted_at', NULL)
+                ->get()
+                ->row_array();
+
+            $used_days = (int) $used['hari'];
+            $balances[] = array(
+                'kode' => $type['kode'],
+                'nama' => $type['nama'],
+                'jatah' => (int) $type['jatah'],
+                'terpakai' => $used_days,
+                'sisa' => max((int) $type['jatah'] - $used_days, 0),
+                'potong_kuota' => (int) $type['potong_kuota'],
+                'keterangan' => $type['keterangan'],
+            );
+        }
+
+        return $balances;
+    }
+
     public function requests($pegawai_id)
     {
         return $this->db
@@ -45,6 +126,25 @@ class Cuti_model extends CI_Model
 
     public function submit_request(array $data)
     {
+        $type = $this->find_leave_type($data['jenis_cuti']);
+        if (!$type) {
+            return FALSE;
+        }
+
+        $days = ((strtotime($data['tgl_selesai']) - strtotime($data['tgl_mulai'])) / 86400) + 1;
+        if ($days <= 0) {
+            return FALSE;
+        }
+
+        if (!empty($type['potong_kuota']) && (int) $type['jatah'] > 0) {
+            $balance = $this->leave_balance_by_type((int) $data['pegawai_id'], date('Y', strtotime($data['tgl_mulai'])));
+            foreach ($balance as $row) {
+                if ($row['kode'] === $data['jenis_cuti'] && $days > (int) $row['sisa']) {
+                    return FALSE;
+                }
+            }
+        }
+
         return $this->db->insert('tb_cuti', array(
             'pegawai_id' => (int) $data['pegawai_id'],
             'jenis_cuti' => $data['jenis_cuti'],
@@ -114,5 +214,59 @@ class Cuti_model extends CI_Model
         $this->db->trans_complete();
 
         return $this->db->trans_status();
+    }
+
+    public function save_leave_type(array $data, array $viewer)
+    {
+        $payload = array(
+            'kode' => strtoupper($data['kode']),
+            'nama' => $data['nama'],
+            'jatah' => (int) $data['jatah'],
+            'aktif' => (int) $data['aktif'],
+            'potong_kuota' => (int) $data['potong_kuota'],
+            'keterangan' => $data['keterangan'],
+        );
+
+        $config_key = 'leave_type_' . strtolower(preg_replace('/[^a-z0-9]+/i', '_', $payload['kode']));
+        $existing = $this->db
+            ->from('tb_konfigurasi')
+            ->where('kategori', 'cuti_jenis')
+            ->where('id', !empty($data['id']) ? (int) $data['id'] : 0)
+            ->get()
+            ->row_array();
+
+        if ($existing) {
+            return $this->db->where('id', (int) $existing['id'])->update('tb_konfigurasi', array(
+                'config_key' => $config_key,
+                'config_value' => json_encode($payload),
+                'updated_by' => (int) $viewer['id'],
+            ));
+        }
+
+        return $this->db->insert('tb_konfigurasi', array(
+            'config_key' => $config_key,
+            'config_value' => json_encode($payload),
+            'kategori' => 'cuti_jenis',
+            'updated_by' => (int) $viewer['id'],
+        ));
+    }
+
+    public function delete_leave_type($id)
+    {
+        return $this->db
+            ->where('id', (int) $id)
+            ->where('kategori', 'cuti_jenis')
+            ->delete('tb_konfigurasi');
+    }
+
+    public function find_leave_type($kode)
+    {
+        foreach ($this->leave_types(FALSE) as $type) {
+            if ($type['kode'] === $kode) {
+                return $type;
+            }
+        }
+
+        return NULL;
     }
 }

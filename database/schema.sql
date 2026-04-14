@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS tb_cuti (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     pegawai_id INT UNSIGNED NOT NULL,
     approver_id INT UNSIGNED NULL,
-    jenis_cuti ENUM('TAHUNAN', 'SAKIT', 'MELAHIRKAN', 'DUKA', 'PENTING', 'TANPA_KETERANGAN') NOT NULL,
+    jenis_cuti VARCHAR(100) NOT NULL,
     tgl_mulai DATE NOT NULL,
     tgl_selesai DATE NOT NULL,
     status ENUM('PENDING', 'APPROVED_UNIT', 'APPROVED_HR', 'DITOLAK', 'BATAL') NOT NULL DEFAULT 'PENDING',
@@ -225,5 +225,11 @@ INSERT INTO tb_konfigurasi (config_key, config_value, kategori, updated_by) VALU
 ('app_name', 'Absensi RS', 'umum', 1),
 ('default_attendance_radius', '100', 'absensi', 1),
 ('office_latitude', '-6.200000', 'absensi', 1),
-('office_longitude', '106.816666', 'absensi', 1)
+('office_longitude', '106.816666', 'absensi', 1),
+('leave_type_tahunan', JSON_OBJECT('kode', 'TAHUNAN', 'nama', 'Cuti Tahunan', 'jatah', 12, 'aktif', 1, 'potong_kuota', 1, 'keterangan', 'Jatah cuti tahunan reguler'), 'cuti_jenis', 1),
+('leave_type_sakit', JSON_OBJECT('kode', 'SAKIT', 'nama', 'Cuti Sakit', 'jatah', 12, 'aktif', 1, 'potong_kuota', 0, 'keterangan', 'Tidak memotong kuota tahunan'), 'cuti_jenis', 1),
+('leave_type_melahirkan', JSON_OBJECT('kode', 'MELAHIRKAN', 'nama', 'Cuti Melahirkan', 'jatah', 90, 'aktif', 1, 'potong_kuota', 0, 'keterangan', 'Jatah hari kalender default'), 'cuti_jenis', 1),
+('leave_type_duka', JSON_OBJECT('kode', 'DUKA', 'nama', 'Cuti Duka', 'jatah', 3, 'aktif', 1, 'potong_kuota', 0, 'keterangan', 'Cuti kedukaan'), 'cuti_jenis', 1),
+('leave_type_penting', JSON_OBJECT('kode', 'PENTING', 'nama', 'Cuti Penting', 'jatah', 5, 'aktif', 1, 'potong_kuota', 0, 'keterangan', 'Keperluan penting'), 'cuti_jenis', 1),
+('leave_type_tanpa_keterangan', JSON_OBJECT('kode', 'TANPA_KETERANGAN', 'nama', 'Tanpa Keterangan', 'jatah', 0, 'aktif', 1, 'potong_kuota', 0, 'keterangan', 'Digunakan untuk status khusus'), 'cuti_jenis', 1)
 ON DUPLICATE KEY UPDATE config_value = VALUES(config_value), updated_by = VALUES(updated_by);

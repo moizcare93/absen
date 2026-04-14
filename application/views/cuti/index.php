@@ -14,6 +14,99 @@
         </div>
     </header>
 
+    <?php if ((int) $current_user['level'] === 1): ?>
+        <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-bold text-slate-900">Master Jenis Cuti</p>
+                    <p class="text-xs text-slate-500">Super user mengatur kategori cuti yang nanti dipilih oleh pegawai.</p>
+                </div>
+            </div>
+            <form method="post" action="<?php echo site_url('cuti/jenis/simpan'); ?>" class="mt-4 space-y-4">
+                <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">Kode</label>
+                        <input type="text" name="kode" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="TAHUNAN">
+                    </div>
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">Nama Kategori</label>
+                        <input type="text" name="nama" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Cuti Tahunan">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">Jatah per Tahun</label>
+                        <input type="number" min="0" name="jatah" value="12" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">Keterangan</label>
+                        <input type="text" name="keterangan" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Opsional">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                        <input type="checkbox" name="aktif" value="1" checked>
+                        Aktif
+                    </label>
+                    <label class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                        <input type="checkbox" name="potong_kuota" value="1" checked>
+                        Batasi dengan jatah
+                    </label>
+                </div>
+                <button type="submit" class="w-full rounded-2xl bg-brand-500 px-4 py-3 text-sm font-bold text-white">Simpan Jenis Cuti</button>
+            </form>
+
+            <div class="mt-4 space-y-3">
+                <?php foreach ($leave_type_admin as $type): ?>
+                    <article class="rounded-2xl bg-slate-50 p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-bold text-slate-900"><?php echo html_escape($type['nama']); ?></p>
+                                <p class="mt-1 text-xs text-slate-500"><?php echo html_escape($type['kode']); ?> • Jatah <?php echo (int) $type['jatah']; ?> hari/tahun</p>
+                                <?php if (!empty($type['keterangan'])): ?>
+                                    <p class="mt-1 text-xs text-slate-500"><?php echo html_escape($type['keterangan']); ?></p>
+                                <?php endif; ?>
+                            </div>
+                            <span class="rounded-full px-3 py-1 text-xs font-semibold <?php echo !empty($type['aktif']) ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'; ?>"><?php echo !empty($type['aktif']) ? 'Aktif' : 'Nonaktif'; ?></span>
+                        </div>
+                        <form method="post" action="<?php echo site_url('cuti/jenis/hapus/' . (int) $type['id']); ?>" class="mt-3">
+                            <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                            <button type="submit" class="w-full rounded-2xl bg-red-50 px-4 py-3 text-xs font-bold text-red-700" onclick="return confirm('Hapus jenis cuti ini?')">Hapus Jenis Cuti</button>
+                        </form>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-bold text-slate-900">Saldo per Kategori</p>
+                <p class="text-xs text-slate-500">Jatah diambil dari master jenis cuti yang dibuat super user.</p>
+            </div>
+        </div>
+        <div class="mt-4 space-y-3">
+            <?php if (!empty($leave_type_balances)): ?>
+                <?php foreach ($leave_type_balances as $balance): ?>
+                    <article class="rounded-2xl bg-slate-50 p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-bold text-slate-900"><?php echo html_escape($balance['nama']); ?></p>
+                                <p class="mt-1 text-xs text-slate-500"><?php echo html_escape($balance['kode']); ?></p>
+                            </div>
+                            <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">Sisa <?php echo (int) $balance['sisa']; ?> hari</span>
+                        </div>
+                        <p class="mt-3 text-xs text-slate-600">Jatah: <?php echo (int) $balance['jatah']; ?> • Terpakai/Pending: <?php echo (int) $balance['terpakai']; ?></p>
+                    </article>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p class="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">Belum ada master jenis cuti aktif.</p>
+            <?php endif; ?>
+        </div>
+    </div>
+
     <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
         <div class="flex items-center justify-between">
             <div>
@@ -26,8 +119,8 @@
             <div>
                 <label class="mb-2 block text-sm font-semibold text-slate-700">Jenis Cuti</label>
                 <select name="jenis_cuti" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
-                    <?php foreach (array('TAHUNAN', 'SAKIT', 'MELAHIRKAN', 'DUKA', 'PENTING', 'TANPA_KETERANGAN') as $jenis): ?>
-                        <option value="<?php echo $jenis; ?>"><?php echo html_escape($jenis); ?></option>
+                    <?php foreach ($leave_types as $jenis): ?>
+                        <option value="<?php echo html_escape($jenis['kode']); ?>"><?php echo html_escape($jenis['nama'] . ' (' . $jenis['kode'] . ')'); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>

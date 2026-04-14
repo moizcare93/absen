@@ -21,6 +21,7 @@ class Jadwal extends Auth_Controller
             'selected_pegawai_id' => $pegawai_id,
             'schedules' => $this->Jadwal_model->monthly((int) $user['pegawai_id'], $month),
             'all_schedules' => $this->Jadwal_model->all_monthly($user, $month, $pegawai_id),
+            'leave_requests' => $this->Jadwal_model->monthly_leave_requests($user, $month, $pegawai_id),
             'employees' => $this->Jadwal_model->employees($user),
             'shifts' => $this->Jadwal_model->shifts(),
         ));
