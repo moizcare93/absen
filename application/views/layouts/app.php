@@ -73,17 +73,17 @@
     }
     ?>
 
-    <div class="mx-auto flex min-h-screen w-full max-w-[1700px] gap-6 px-4 pb-24 pt-4 sm:px-6 lg:px-8 lg:pb-8">
+    <div class="min-h-screen lg:flex">
         <?php if (!empty($current_user)): ?>
             <aside class="hidden lg:flex lg:w-72 lg:flex-col xl:w-80">
-                <div class="sticky top-4 overflow-hidden rounded-[2rem] bg-slate-950 text-white shadow-soft">
+                <div class="flex min-h-screen w-full flex-col bg-slate-950 text-white shadow-soft">
                     <div class="border-b border-white/10 px-6 pb-6 pt-7">
                         <p class="text-xs font-semibold uppercase tracking-[0.32em] text-emerald-300">Absensi RS</p>
                         <p class="mt-4 text-2xl font-black leading-tight"><?php echo html_escape($current_user['nama']); ?></p>
                         <p class="mt-2 text-sm text-slate-300"><?php echo html_escape($current_user['nama_role']); ?></p>
                         <p class="text-sm text-slate-400"><?php echo html_escape($current_user['nama_unit']); ?></p>
                     </div>
-                    <nav class="space-y-1 px-4 py-5">
+                    <nav class="flex-1 space-y-1 px-4 py-5">
                         <?php foreach ($menu as $item): ?>
                             <?php $active = strpos($current_route, trim(parse_url($item['url'], PHP_URL_PATH), '/')) !== FALSE; ?>
                             <a href="<?php echo $item['url']; ?>" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition <?php echo $active ? 'bg-brand-500 text-white shadow-soft' : 'text-slate-300 hover:bg-white/8 hover:text-white'; ?>">
@@ -103,24 +103,50 @@
 
         <div class="min-w-0 flex-1">
             <?php if (!empty($current_user)): ?>
-                <div class="admin-shell mb-4 hidden items-center justify-between rounded-[2rem] px-6 py-4 lg:flex">
-                    <div>
-                        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-brand-600">Control Center</p>
-                        <h1 class="mt-2 text-2xl font-black text-slate-900"><?php echo html_escape($page_title); ?></h1>
-                    </div>
-                    <div class="flex items-center gap-3 rounded-2xl bg-slate-950 px-4 py-3 text-right text-white">
+                <div class="hidden lg:flex lg:min-h-screen lg:flex-col">
+                    <header class="admin-shell sticky top-0 z-10 mx-6 mt-6 flex items-center justify-between rounded-[2rem] px-6 py-4">
                         <div>
-                            <p class="text-sm font-semibold"><?php echo html_escape($current_user['nama']); ?></p>
-                            <p class="text-xs text-slate-400"><?php echo html_escape($current_user['nama_role']); ?></p>
+                            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-brand-600">Control Center</p>
+                            <h1 class="mt-2 text-2xl font-black text-slate-900"><?php echo html_escape($page_title); ?></h1>
                         </div>
-                        <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-500 text-sm font-black">
-                            <?php echo html_escape(strtoupper(substr($current_user['nama'], 0, 1))); ?>
+                        <div class="flex items-center gap-3 rounded-2xl bg-slate-950 px-4 py-3 text-right text-white">
+                            <div>
+                                <p class="text-sm font-semibold"><?php echo html_escape($current_user['nama']); ?></p>
+                                <p class="text-xs text-slate-400"><?php echo html_escape($current_user['nama_role']); ?></p>
+                            </div>
+                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-500 text-sm font-black">
+                                <?php echo html_escape(strtoupper(substr($current_user['nama'], 0, 1))); ?>
+                            </div>
                         </div>
-                    </div>
+                    </header>
+
+                    <main class="flex-1 px-6 pb-6 pt-6">
+                        <div class="mx-auto flex h-full w-full max-w-6xl flex-col">
+                            <?php if ($this->session->flashdata('error')): ?>
+                                <div class="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                    <?php echo html_escape($this->session->flashdata('error')); ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($this->session->flashdata('success')): ?>
+                                <div class="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                                    <?php echo html_escape($this->session->flashdata('success')); ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php $this->load->view($content_view); ?>
+                        </div>
+                    </main>
+
+                    <footer class="border-t border-slate-200/80 px-6 py-4 text-xs text-slate-500">
+                        <div class="mx-auto flex w-full max-w-6xl items-center justify-between">
+                            <span><?php echo html_escape($app_name); ?></span>
+                            <span>Dashboard Operasional Rumah Sakit</span>
+                        </div>
+                    </footer>
                 </div>
             <?php endif; ?>
 
-            <div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col">
+            <div class="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-24 pt-4 sm:px-6 lg:hidden">
                 <?php if ($this->session->flashdata('error')): ?>
                     <div class="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                         <?php echo html_escape($this->session->flashdata('error')); ?>
