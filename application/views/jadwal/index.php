@@ -5,6 +5,7 @@
         <p class="mt-2 text-sm text-emerald-50">Admin dapat mengatur jadwal per pegawai, sementara pegawai melihat jadwalnya sendiri.</p>
     </header>
 
+    <div class="grid gap-4 xl:grid-cols-[0.95fr_1.35fr]">
     <?php if ((int) $current_user['level'] <= 3): ?>
         <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
             <p class="text-sm font-bold text-slate-900">Atur Jadwal Pegawai</p>
@@ -18,7 +19,7 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid gap-3 md:grid-cols-2">
                     <div>
                         <label class="mb-2 block text-sm font-semibold text-slate-700">Tanggal</label>
                         <input type="date" name="tanggal" value="<?php echo html_escape(date('Y-m-d')); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -47,7 +48,7 @@
 
     <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
         <form method="get" action="<?php echo site_url('jadwal'); ?>" class="space-y-4">
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-3 md:grid-cols-2">
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Bulan</label>
                     <input type="month" name="bulan" value="<?php echo html_escape($month); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -67,7 +68,9 @@
             <button type="submit" class="w-full rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-700">Tampilkan Jadwal</button>
         </form>
     </div>
+    </div>
 
+    <div class="grid gap-4 xl:grid-cols-[1.2fr_0.95fr]">
     <div class="space-y-3">
         <?php $rows = (int) $current_user['level'] <= 3 ? $all_schedules : $schedules; ?>
         <?php if (!empty($rows)): ?>
@@ -122,5 +125,6 @@
                 <p class="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">Tidak ada pengajuan cuti pada bulan ini.</p>
             <?php endif; ?>
         </div>
+    </div>
     </div>
 </section>

@@ -2,7 +2,7 @@
     <header class="rounded-[2rem] bg-white p-5 shadow-soft ring-1 ring-slate-200">
         <p class="text-xs font-semibold uppercase tracking-[0.28em] text-brand-500">Cuti</p>
         <h1 class="mt-3 text-2xl font-black text-slate-900">Pengajuan, Approval & Saldo</h1>
-        <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="mt-4 grid grid-cols-2 gap-3 lg:max-w-md">
             <div class="rounded-2xl bg-emerald-50 p-4">
                 <p class="text-xs text-emerald-700">Saldo Tahunan</p>
                 <p class="mt-2 text-2xl font-black text-emerald-900"><?php echo html_escape(isset($leave_summary['saldo_tahunan']) ? $leave_summary['saldo_tahunan'] : 0); ?></p>
@@ -14,6 +14,7 @@
         </div>
     </header>
 
+    <div class="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
     <?php if ((int) $current_user['level'] === 1): ?>
         <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
             <div class="flex items-center justify-between">
@@ -28,7 +29,7 @@
             <form method="post" action="<?php echo site_url('cuti/jenis/simpan'); ?>" class="mt-4 space-y-4">
                 <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
                 <input type="hidden" name="id" value="<?php echo html_escape(!empty($editing_type['id']) ? $editing_type['id'] : ''); ?>">
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid gap-3 md:grid-cols-2">
                     <div>
                         <label class="mb-2 block text-sm font-semibold text-slate-700">Kode</label>
                         <input type="text" name="kode" value="<?php echo html_escape(!empty($editing_type['kode']) ? $editing_type['kode'] : ''); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="TAHUNAN">
@@ -38,7 +39,7 @@
                         <input type="text" name="nama" value="<?php echo html_escape(!empty($editing_type['nama']) ? $editing_type['nama'] : ''); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Cuti Tahunan">
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid gap-3 md:grid-cols-2">
                     <div>
                         <label class="mb-2 block text-sm font-semibold text-slate-700">Jatah per Tahun</label>
                         <input type="number" min="0" name="jatah" value="<?php echo html_escape(isset($editing_type['jatah']) ? $editing_type['jatah'] : 12); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -48,7 +49,7 @@
                         <input type="text" name="keterangan" value="<?php echo html_escape(!empty($editing_type['keterangan']) ? $editing_type['keterangan'] : ''); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="Opsional">
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid gap-3 md:grid-cols-2">
                     <label class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
                         <input type="checkbox" name="aktif" value="1" <?php echo empty($editing_type) || !empty($editing_type['aktif']) ? 'checked' : ''; ?>>
                         Aktif
@@ -113,7 +114,9 @@
             <?php endif; ?>
         </div>
     </div>
+    </div>
 
+    <div class="grid gap-4 xl:grid-cols-[1fr_1fr]">
     <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
         <div class="flex items-center justify-between">
             <div>
@@ -135,7 +138,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-3 md:grid-cols-2">
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Mulai</label>
                     <input type="date" name="tgl_mulai" value="<?php echo html_escape(!empty($editing_request['tgl_mulai']) ? $editing_request['tgl_mulai'] : date('Y-m-d')); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -193,6 +196,7 @@
                 <p class="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">Belum ada pengajuan cuti.</p>
             <?php endif; ?>
         </div>
+    </div>
     </div>
 
     <?php if ((int) $current_user['level'] <= 3): ?>

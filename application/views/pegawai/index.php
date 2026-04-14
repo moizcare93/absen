@@ -5,7 +5,7 @@
         <p class="mt-2 text-sm text-slate-300">Menu ini sudah mendukung tambah, update, dan hapus/nonaktifkan pegawai.</p>
     </header>
 
-    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
+    <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft lg:p-6">
         <div class="flex items-center justify-between gap-3">
             <div>
                 <p class="text-sm font-bold text-slate-900"><?php echo !empty($editing) ? 'Edit Pegawai' : 'Tambah Pegawai'; ?></p>
@@ -20,7 +20,7 @@
             <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
             <input type="hidden" name="id" value="<?php echo html_escape(!empty($editing['id']) ? $editing['id'] : ''); ?>">
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-3 md:grid-cols-2">
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Nama</label>
                     <input type="text" name="nama" value="<?php echo html_escape(set_value('nama', !empty($editing['nama']) ? $editing['nama'] : '')); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -31,7 +31,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-3 md:grid-cols-2">
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Email</label>
                     <input type="email" name="email" value="<?php echo html_escape(set_value('email', !empty($editing['email']) ? $editing['email'] : '')); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-3 md:grid-cols-2">
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Jabatan</label>
                     <input type="text" name="jabatan" value="<?php echo html_escape(set_value('jabatan', !empty($editing['jabatan']) ? $editing['jabatan'] : '')); ?>" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -53,7 +53,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-3 md:grid-cols-2">
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Unit</label>
                     <select name="unit_id" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -72,7 +72,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-3 md:grid-cols-2">
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Tipe Kerja</label>
                     <select name="tipe_kerja" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -91,7 +91,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-3 md:grid-cols-2">
                 <div>
                     <label class="mb-2 block text-sm font-semibold text-slate-700">Password</label>
                     <input type="password" name="password" value="" class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm" placeholder="<?php echo !empty($editing) ? 'Kosongkan bila tidak ganti' : 'Minimal 8 karakter'; ?>">
@@ -108,7 +108,7 @@
         </form>
     </div>
 
-    <div class="space-y-3">
+    <div class="grid gap-4 xl:grid-cols-2">
         <?php foreach ($employees as $employee): ?>
             <article class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft">
                 <div class="flex items-start justify-between gap-3">

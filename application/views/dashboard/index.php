@@ -1,4 +1,4 @@
-<header class="rounded-[2rem] bg-slate-900 p-5 text-white shadow-soft">
+<header class="rounded-[2rem] bg-slate-900 p-5 text-white shadow-soft lg:p-7">
     <div class="flex items-start justify-between gap-4">
         <div>
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200">Dashboard</p>
@@ -8,7 +8,7 @@
         <a href="<?php echo site_url('auth/logout'); ?>" class="rounded-2xl border border-white/15 px-3 py-2 text-xs font-semibold text-white/80">Logout</a>
     </div>
 
-    <div class="mt-6 grid grid-cols-2 gap-3">
+    <div class="mt-6 grid grid-cols-2 gap-3 lg:max-w-2xl">
         <div class="rounded-2xl bg-white/10 p-4">
             <p class="text-xs text-slate-300">Status Hari Ini</p>
             <p class="mt-2 text-lg font-bold"><?php echo html_escape(isset($snapshot['attendance']['status']) ? $snapshot['attendance']['status'] : 'Belum Absen'); ?></p>
@@ -22,7 +22,7 @@
 
 <section class="mt-4 space-y-4">
     <?php if (!empty($admin_snapshot)): ?>
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-3 gap-3 xl:grid-cols-3">
             <div class="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-soft">
                 <p class="text-xs text-slate-500">Pegawai Aktif</p>
                 <p class="mt-2 text-2xl font-black text-slate-900"><?php echo (int) $admin_snapshot['employees']; ?></p>
@@ -45,7 +45,7 @@
                 <p class="text-xs text-slate-500">Dirancang untuk penggunaan satu tangan di layar HP.</p>
             </div>
         </div>
-        <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
             <a href="<?php echo site_url('absensi'); ?>" class="rounded-2xl bg-brand-500 px-4 py-4 text-sm font-bold text-white">Absen Sekarang</a>
             <a href="<?php echo site_url('cuti'); ?>" class="rounded-2xl bg-slate-100 px-4 py-4 text-sm font-bold text-slate-700">Ajukan Cuti</a>
             <?php if ((int) $current_user['level'] <= 3): ?>
@@ -55,6 +55,7 @@
         </div>
     </div>
 
+    <div class="grid gap-4 xl:grid-cols-[1.4fr_0.9fr]">
     <div class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft">
         <div class="flex items-center justify-between">
             <div>
@@ -99,5 +100,6 @@
                 <p class="mt-2 text-2xl font-black text-amber-800"><?php echo html_escape(isset($snapshot['leave_balance']['terpakai_tahunan']) ? $snapshot['leave_balance']['terpakai_tahunan'] : 0); ?></p>
             </div>
         </div>
+    </div>
     </div>
 </section>
